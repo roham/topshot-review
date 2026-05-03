@@ -3,14 +3,18 @@ import type { Card } from "@/lib/cards";
 export function EmailCard({ card }: { card: Card }) {
   const d = card.data as {
     from: string;
+    to?: string;
     subject: string;
     preview: string;
     body: string[];
     table?: { player: string; ceiling: string; trade: string; call: string }[];
     signoff: string;
     ps?: string;
-    vars?: string[];
   };
+
+  const fromName = d.from.split("<")[0].trim();
+  const fromEmail = (d.from.match(/<([^>]+)>/)?.[1]) ?? "";
+  const initial = fromName.charAt(0).toUpperCase();
 
   return (
     <div className="email-frame mx-auto max-w-[440px] rounded-[28px] bg-white shadow-card overflow-hidden">
@@ -38,13 +42,13 @@ export function EmailCard({ card }: { card: Card }) {
       <div className="px-5 pt-4">
         <h3 className="text-[19px] font-semibold leading-[1.18] text-black tracking-tight text-balance">{d.subject}</h3>
         <div className="mt-3 flex items-center gap-3">
-          <div className="h-9 w-9 rounded-full bg-gradient-to-br from-flame-500 to-flame-700 grid place-items-center text-white text-xs font-semibold">M</div>
+          <div className="h-9 w-9 rounded-full bg-gradient-to-br from-flame-500 to-flame-700 grid place-items-center text-white text-xs font-semibold">{initial}</div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between">
-              <span className="text-[14px] font-semibold text-black truncate">{d.from.split("<")[0].trim()}</span>
-              <span className="text-[12px] text-black/50">{card.date?.split("·")[1]?.trim() ?? "9:00 AM"}</span>
+              <span className="text-[14px] font-semibold text-black truncate">{fromName}</span>
+              <span className="text-[12px] text-black/50">9:00 AM</span>
             </div>
-            <div className="text-[12px] text-black/55">to me</div>
+            <div className="text-[12px] text-black/55">to me {fromEmail && <span className="text-black/35">· {fromEmail}</span>}</div>
           </div>
         </div>
       </div>
@@ -73,31 +77,14 @@ export function EmailCard({ card }: { card: Card }) {
               </table>
             </div>
           ) : (
-            <p key={i} dangerouslySetInnerHTML={{ __html: highlightTokens(p) }} />
+            <p key={i}>{p}</p>
           )
         )}
         <div className="pt-2 whitespace-pre-line text-[14px] text-black/90 font-medium">{d.signoff}</div>
         {d.ps && (
-          <p className="pt-2 text-[13.5px] italic text-black/65" dangerouslySetInnerHTML={{ __html: highlightTokens(d.ps) }} />
+          <p className="pt-2 text-[13.5px] italic text-black/65">{d.ps}</p>
         )}
       </div>
-
-      {d.vars && (
-        <div className="px-5 py-3 bg-flame-50 border-t border-flame-100">
-          <div className="text-[10px] uppercase tracking-[0.14em] text-flame-700 font-semibold mb-1">Personalization tokens</div>
-          <div className="flex flex-wrap gap-1">
-            {d.vars.map((v) => (
-              <span key={v} className="text-[10.5px] px-1.5 py-0.5 rounded bg-white text-flame-700 font-mono border border-flame-100">
-                {`{{${v}}}`}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
-}
-
-function highlightTokens(s: string) {
-  return s.replace(/\{\{([A-Z_]+)\}\}/g, '<span class="px-1 py-[1px] rounded bg-flame-100 text-flame-700 font-mono text-[12.5px]">{{$1}}</span>');
 }

@@ -2,7 +2,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
 import type { Card } from "@/lib/cards";
-import { SEGMENT_REASONS } from "@/lib/cards";
+import { REASONS } from "@/lib/cards";
 import { CardShell } from "./CardShell";
 
 type Vote = "ship" | "no" | "needs-work";
@@ -144,7 +144,7 @@ function ReasonModal({ onSubmit, onClose }: { onSubmit: (note: string, reasons: 
       <motion.div className="w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl bg-ink-900 border border-white/10 p-5" initial={{ y: 40 }} animate={{ y: 0 }} onClick={(e) => e.stopPropagation()}>
         <div className="text-[11px] uppercase tracking-wider text-amber-500 font-semibold">Needs work — what's off?</div>
         <div className="mt-3 flex flex-wrap gap-1.5">
-          {SEGMENT_REASONS.map((r) => {
+          {REASONS.map((r) => {
             const on = picked.includes(r);
             return (
               <button
@@ -196,9 +196,8 @@ function Done({ shipped, killed, needsWork, total, voter }: { shipped: number; k
           </div>
         </div>
         <div className="mt-6 text-[12px] text-ink-400">{pct}% ship rate</div>
-        <div className="mt-8 flex flex-col gap-2">
-          <a href="/calendar" className="h-11 grid place-items-center rounded-xl bg-flame-500 text-white font-semibold text-[14px] hover:bg-flame-600">See the calendar view</a>
-          <a href="/" className="h-11 grid place-items-center rounded-xl border border-white/10 text-ink-200 text-[14px] hover:bg-white/[0.04]">Back to start</a>
+        <div className="mt-8">
+          <a href="/" className="h-11 inline-flex items-center justify-center px-6 rounded-xl bg-flame-500 text-white font-semibold text-[14px] hover:bg-flame-600">Done</a>
         </div>
       </div>
     </div>

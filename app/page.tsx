@@ -23,18 +23,17 @@ export default function Home() {
     <main className="min-h-[100dvh] flex flex-col">
       <header className="px-6 pt-6 pb-2 flex items-center justify-between">
         <Logo />
-        <Link href="/calendar" className="text-[11px] uppercase tracking-wider text-ink-400 hover:text-ink-100">Calendar →</Link>
+        <span className="text-[11px] uppercase tracking-wider text-ink-500">v2</span>
       </header>
 
       <div className="flex-1 grid place-items-center px-6 py-10">
         <div className="max-w-lg w-full text-center">
-          <div className="text-[10px] uppercase tracking-[0.22em] text-flame-400 font-semibold">May 4 – 10 · Round 2</div>
+          <div className="text-[10px] uppercase tracking-[0.22em] text-flame-400 font-semibold">Round 2 · Marketing review</div>
           <h1 className="mt-3 font-display text-[40px] sm:text-5xl font-semibold tracking-tight text-ink-50 text-balance leading-[1.05]">
-            Reactivate <span className="text-flame-400">L+XL</span>.<br/>
-            Tell us what ships.
+            Tell us what to send.
           </h1>
           <p className="mt-4 text-[15px] sm:text-base text-ink-300 text-pretty leading-relaxed">
-            Magic's proposal for the next 7 days, deconstructed into 14 pieces — emails, social, calendar, decisions. Swipe through them. Three choices per piece: <span className="text-mint-500 font-semibold">ship it</span>, <span className="text-rose-500 font-semibold">nope</span>, <span className="text-amber-500 font-semibold">needs work</span>. Takes 4 minutes.
+            Real emails, social posts, and Discord messages we want to send next week to bring back longtime Top Shot collectors who've gone quiet. You'll see exactly what they'll see. For each one, tap <span className="text-mint-500 font-semibold">ship it</span>, <span className="text-rose-500 font-semibold">nope</span>, or <span className="text-amber-500 font-semibold">needs work</span>. About 3 minutes.
           </p>
 
           <div className="mt-7 max-w-sm mx-auto">
@@ -62,12 +61,12 @@ export default function Home() {
 
           <div className="mt-12 grid grid-cols-3 gap-3 text-left">
             {[
-              { n: "14", l: "Pieces" },
-              { n: "80–115", l: "Reactivated forecast" },
-              { n: "$2.5M", l: "Annualized recovered" },
+              { n: "7", l: "Pieces" },
+              { n: "~3 min", l: "To review" },
+              { n: "Email · X · Discord", l: "Surfaces" },
             ].map((x) => (
               <div key={x.l} className="rounded-2xl border border-white/10 bg-white/[0.02] p-3">
-                <div className="font-display text-[18px] sm:text-xl font-semibold text-ink-50">{x.n}</div>
+                <div className="font-display text-[15px] sm:text-base font-semibold text-ink-50">{x.n}</div>
                 <div className="text-[10.5px] uppercase tracking-wider text-ink-400 mt-1">{x.l}</div>
               </div>
             ))}
