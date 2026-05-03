@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html, body {
+  background: #0a0a0b;
+  color: #ececf0;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 70% -10%, rgba(255,107,0,0.10), transparent 60%),
+    radial-gradient(800px 600px at -10% 110%, rgba(255,107,0,0.06), transparent 60%),
+    #0a0a0b;
+  min-height: 100vh;
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+  .text-pretty { text-wrap: pretty; }
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+  .scrollbar-none { scrollbar-width: none; }
+}
+
+.email-frame {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.x-frame {
+  font-family: "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.discord-frame {
+  font-family: "gg sans", "Noto Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+@keyframes ping-soft {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+.ping-soft { animation: ping-soft 1s ease-out forwards; }
