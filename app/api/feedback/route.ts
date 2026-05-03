@@ -58,7 +58,23 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  // Debug endpoint — append ?debug=1 to inspect env-var visibility (no values leaked)
+  if (req.nextUrl.searchParams.get("debug") === "1") {
+    return NextResponse.json({
+      env_presence: {
+        GH_TOKEN_present: !!process.env.GH_TOKEN,
+        GH_TOKEN_length: process.env.GH_TOKEN ? process.env.GH_TOKEN.length : 0,
+        GH_REPO_present: !!process.env.GH_REPO,
+        GH_REPO_value: process.env.GH_REPO ?? null,
+        GH_BRANCH_present: !!process.env.GH_BRANCH,
+        GH_BRANCH_value: process.env.GH_BRANCH ?? null,
+        VERCEL_present: !!process.env.VERCEL,
+        VERCEL_ENV: process.env.VERCEL_ENV ?? null,
+        all_env_keys_starting_GH: Object.keys(process.env).filter(k => k.startsWith("GH")),
+      },
+    });
+  }
   try {
     if (!GH_TOKEN || !GH_REPO) {
       return NextResponse.json({ feedback: [], note: "Storage not configured. Set GH_TOKEN and GH_REPO env vars in Vercel." });
