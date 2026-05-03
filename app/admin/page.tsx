@@ -10,10 +10,15 @@ export default function AdminPage() {
   const [data, setData] = useState<Feedback[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const [storageNote, setStorageNote] = useState<string | null>(null);
+
   useEffect(() => {
     fetch("/api/feedback")
       .then((r) => r.json())
-      .then((j) => setData(j.feedback ?? []))
+      .then((j) => {
+        setData(j.feedback ?? []);
+        if (j.note) setStorageNote(j.note);
+      })
       .catch((e) => setError(String(e)));
   }, []);
 
@@ -39,6 +44,11 @@ export default function AdminPage() {
         <h1 className="mt-2 font-display text-3xl sm:text-4xl font-semibold tracking-tight text-ink-50">What came back</h1>
         <p className="mt-2 text-[14.5px] text-ink-300">Per-piece tally, raw notes, who said what.</p>
 
+        {storageNote && (
+          <div className="mt-6 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-[13px] text-amber-200">
+            <span className="font-semibold">Votes aren't being saved.</span> {storageNote}
+          </div>
+        )}
         {error && <div className="mt-6 rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-[13px] text-rose-300">Couldn't load: {error}</div>}
         {!data && !error && <div className="mt-6 text-[13px] text-ink-400">Loading…</div>}
         {data && data.length === 0 && (
