@@ -83,7 +83,7 @@ export const CARDS: Card[] = [
     title: "Email — for everyone else who's gone quiet",
     audience:
       "Sent to collectors who used to spend a lot ($100,000+ lifetime) but don't own Moments from any of tonight's playoff teams. About 770 people. The broad-net send.",
-    date: "Sent Monday May 5, 3:00 PM ET",
+    date: "Sent Monday May 5, 3:00 PM ET — goes to everyone who hasn't bought in 60+ days and doesn't own Moments from tonight's playoff teams. The specific game outcomes in the body will be filled in after tonight's games. You're reviewing the structure and voice.",
     data: {
       from: "Magic <magic@nbatopshot.com>",
       to: "you@example.com",
@@ -111,7 +111,7 @@ export const CARDS: Card[] = [
     title: "Public post on X (Twitter)",
     audience:
       "Anyone on X. Public. Goes out about an hour after both Game 7s end tonight. We're hoping it gets shared by basketball Twitter and journalists.",
-    date: "Tonight (Saturday May 3) around 9 PM ET — after both Game 7s settle",
+    date: "Tonight (Sunday May 3) around 9 PM ET — after both Game 7s settle",
     data: {
       tweets: [
         "Three days before tonight's East Game 7s, the market made four bets:\n\nCade — $1,110 ceiling\nBanchero — $499 accumulation\nMitchell — quiet conviction\nBarrett — $0.28 floor, one buyer\n\nHere's what just resolved.",
@@ -128,7 +128,7 @@ export const CARDS: Card[] = [
     title: "Pinned post in our Discord community",
     audience:
       "Active collectors in the NBA Top Shot Discord. People who hang out there every day and discuss drops, trades, and Moments together. Pinned to #general so it stays at the top.",
-    date: "Tonight (Saturday May 3) around 9 PM ET — after both Game 7s end",
+    date: "Tonight (Sunday May 3) around 9 PM ET — after both Game 7s end",
     data: {
       author: "Top Shot",
       role: "Mod",
