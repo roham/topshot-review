@@ -375,6 +375,36 @@ export const AUTORESEARCH_DEFAULTS: MockContext = {
   player_image_url: "/cards/infographics/moment-hero-placeholder.png",
   // currency / time stubs
   currency_symbol: "$",
+  // nested objects — drafters frequently use {{set.name}} / {{user.first_name}} / etc.
+  set: {
+    name: "Rookie Debut · Cooper Flagg",
+    owned_count: "9",
+    total_count: "15",
+    badge_image_url: "/cards/infographics/setcard.png",
+    floor_price: "$72",
+    seven_d_volume: "$447,200",
+  },
+  user: {
+    first_name: "Sarah",
+    lifetime_moments_owned: "94",
+    lifetime_value: "$188,000",
+    days_since_last_session: "1,698",
+  },
+  drop: {
+    name: "Series 9 — Cooper Flagg Rookie Edition",
+    set_name: "The Rookie Era",
+    starts_at_local: "Tue 7:00 PM ET",
+    floor_target: "$72",
+    moment_count: "15",
+    circulation_total: "8,500",
+  },
+  market: {
+    weekly_volume: "$2.4M",
+    weekly_buyers: "3,420",
+    median_price_24h: "$48",
+  },
+  // first_name shortcut (drafter frequently uses bare {{first_name}})
+  first_name: "Sarah",
 };
 
 // ===================================================================
