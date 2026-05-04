@@ -4,8 +4,9 @@ import { CARDS } from "@/lib/cards";
 import { SwipeDeck } from "@/components/SwipeDeck";
 import { ExemplarDeck } from "@/components/ExemplarDeck";
 import { OpenQuestionsDeck } from "@/components/OpenQuestionsDeck";
+import { LabDeck } from "@/components/LabDeck";
 
-type ActiveDeck = "email-variants" | "exemplars" | "open-questions" | null;
+type ActiveDeck = "email-variants" | "exemplars" | "open-questions" | "lab" | null;
 
 export default function ReviewPage() {
   const [voter, setVoter] = useState<string | null>(null);
@@ -37,6 +38,10 @@ export default function ReviewPage() {
 
   if (activeDeck === "open-questions") {
     return <OpenQuestionsDeck voter={voter} onBack={() => setActiveDeck(null)} />;
+  }
+
+  if (activeDeck === "lab") {
+    return <LabDeck voter={voter} onBack={() => setActiveDeck(null)} />;
   }
 
   // Compute total steps for email variants
@@ -85,6 +90,14 @@ export default function ReviewPage() {
             badge="Governance"
             onClick={() => setActiveDeck("open-questions")}
           />
+          <DeckCard
+            title="Lab — autoresearch"
+            subtitle="Top-scoring drafts · live"
+            description="Iterative loop: market research + data + first-principles → drafter → 17-dim scorer → critic → refine. Highest-scoring candidate per (Trigger × ICP × Tier) slice surfaces here, fully designed in the same email shell. Vote ship / needs-work / no — your votes feed the next iteration."
+            accent="emerald"
+            badge="Live · best of"
+            onClick={() => setActiveDeck("lab")}
+          />
         </div>
 
         {/* Footer */}
@@ -116,7 +129,7 @@ function DeckCard({
   title: string;
   subtitle: string;
   description: string;
-  accent: "flame" | "sky" | "violet";
+  accent: "flame" | "sky" | "violet" | "emerald";
   badge: string;
   onClick: () => void;
 }) {
@@ -141,6 +154,13 @@ function DeckCard({
       title: "text-violet-50",
       arrow: "text-violet-400",
       bg: "hover:bg-violet-500/[0.04]",
+    },
+    emerald: {
+      border: "border-emerald-500/30 hover:border-emerald-500/60",
+      badge: "bg-emerald-500/10 border-emerald-500/30 text-emerald-300",
+      title: "text-emerald-50",
+      arrow: "text-emerald-400",
+      bg: "hover:bg-emerald-500/[0.04]",
     },
   };
   const a = accentMap[accent];

@@ -1,7 +1,7 @@
 import type { UpgradeCard as TUpgradeCard, UpgradeState, AfterVariantId, AfterBlock } from "@/lib/cards";
 import { resolveLiquidBody, resolveLiquidString, type LiquidContext } from "@/lib/liquid";
 import { MOCK_CONTEXTS } from "@/lib/mockData";
-import { renderEmail, CARD_TEMPLATE_MAP, type TemplateId } from "./templates";
+import { renderEmail, CARD_TEMPLATE_MAP, resolveTemplateId, type TemplateId } from "./templates";
 
 // ────────────────────────────────────────────────────────────
 // CONSTANTS
@@ -671,7 +671,7 @@ function EmailRendered({
   variant: AfterVariantId;
   cardId: string;
 }) {
-  const templateId = CARD_TEMPLATE_MAP[cardId];
+  const templateId = resolveTemplateId(cardId);
   if (templateId && FULL_TEMPLATES.has(templateId)) {
     return renderEmail({ templateId, variant, after, ctx, mode: "rendered" });
   }
@@ -699,7 +699,25 @@ export function UpgradeCard({
   activeVariant: AfterVariantId;
 }) {
   const after = card.after[activeVariant];
-  const ctx = MOCK_CONTEXTS[card.id] ?? {};
+  // Autoresearch lab cards (id starts with `auto-<trigger>-`) reuse the mock
+  // context for the matching hand-built card so Liquid placeholders resolve.
+  const AUTO_TO_HANDBUILT: Record<string, string> = {
+    "auto-welcome-": "welcome-onboarding",
+    "auto-pack-received-": "pack-received-voice",
+    "auto-drop-announcement-": "drop-announcement-programmatic",
+    "auto-fast-break-": "fast-break-result-fix",
+    "auto-abandoned-cart-": "abandoned-cart",
+    "auto-reactivation-": "reactivation-drip",
+    "auto-whale-": "whale-tier-concierge",
+  };
+  let mockKey = card.id;
+  for (const [prefix, handBuiltId] of Object.entries(AUTO_TO_HANDBUILT)) {
+    if (card.id.startsWith(prefix)) {
+      mockKey = handBuiltId;
+      break;
+    }
+  }
+  const ctx = MOCK_CONTEXTS[mockKey] ?? {};
 
   if (!after) return null;
 

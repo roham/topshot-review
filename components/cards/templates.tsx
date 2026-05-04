@@ -48,6 +48,27 @@ export const CARD_TEMPLATE_MAP: Record<string, TemplateId> = {
   "whale-tier-concierge": "whale-tier",
 };
 
+// Autoresearch lab cards use IDs of shape `auto-<trigger>-<slice>-iterN-candM`.
+// Map the trigger prefix to the matching per-trigger template so the same
+// design surface renders both hand-built cards and autoresearch outputs.
+const AUTO_TRIGGER_PREFIX_TO_TEMPLATE: { prefix: string; templateId: TemplateId }[] = [
+  { prefix: "auto-welcome-", templateId: "welcome" },
+  { prefix: "auto-pack-received-", templateId: "pack-received" },
+  { prefix: "auto-drop-announcement-", templateId: "drop-announcement" },
+  { prefix: "auto-fast-break-", templateId: "fast-break" },
+  { prefix: "auto-abandoned-cart-", templateId: "abandoned-cart" },
+  { prefix: "auto-reactivation-", templateId: "reactivation" },
+  { prefix: "auto-whale-", templateId: "whale-tier" },
+];
+
+export function resolveTemplateId(cardId: string): TemplateId | undefined {
+  if (CARD_TEMPLATE_MAP[cardId]) return CARD_TEMPLATE_MAP[cardId];
+  for (const { prefix, templateId } of AUTO_TRIGGER_PREFIX_TO_TEMPLATE) {
+    if (cardId.startsWith(prefix)) return templateId;
+  }
+  return undefined;
+}
+
 export type RenderArgs = {
   templateId: TemplateId;
   variant: AfterVariantId;
