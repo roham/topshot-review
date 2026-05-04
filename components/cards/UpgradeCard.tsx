@@ -15,10 +15,17 @@ const VARIANT_DESCRIPTIONS: Record<AfterVariantId, string> = {
 };
 
 const VARIANT_TONES: Record<AfterVariantId, string> = {
-  v1001: "border-mint-500/40 bg-mint-500/15 text-mint-200",
-  almanac: "border-flame-500/40 bg-flame-500/15 text-flame-200",
-  cinematic: "border-rose-500/40 bg-rose-500/15 text-rose-200",
-  brief: "border-amber-500/40 bg-amber-500/15 text-amber-200",
+  v1001: "border-mint-500 bg-mint-500/25 text-white",
+  almanac: "border-flame-500 bg-flame-500/25 text-white",
+  cinematic: "border-rose-500 bg-rose-500/25 text-white",
+  brief: "border-amber-500 bg-amber-500/25 text-white",
+};
+
+const VARIANT_DOT_TONES: Record<AfterVariantId, string> = {
+  v1001: "bg-mint-500",
+  almanac: "bg-flame-500",
+  cinematic: "bg-rose-500",
+  brief: "bg-amber-500",
 };
 
 const VARIANT_ORDER: AfterVariantId[] = ["v1001", "almanac", "cinematic", "brief"];
@@ -225,32 +232,39 @@ export function UpgradeCard({
 
       {/* After */}
       <Section title="Proposed upgrade — 4 variants to compare" tone="after">
-        {/* Variant tab strip */}
-        <div className="mb-3 -mx-1 flex flex-wrap gap-1.5">
+        {/* Variant tab strip — high-contrast 2x2 grid so the 4 options are unmissable */}
+        <div className="mb-2 text-[11px] uppercase tracking-wider text-flame-400 font-bold">
+          ↓ tap a tab to compare versions
+        </div>
+        <div className="mb-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
           {VARIANT_ORDER.map((v) => {
             const isActive = v === activeVariant;
             return (
               <button
                 key={v}
                 onClick={() => onVariantChange(v)}
-                className={`px-2.5 py-1.5 rounded-lg border text-[11px] font-semibold uppercase tracking-wider transition ${
+                className={`flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl border-2 text-[12px] font-bold uppercase tracking-wider transition ${
                   isActive
-                    ? VARIANT_TONES[v]
-                    : "border-white/10 bg-white/[0.02] text-ink-400 hover:bg-white/[0.05]"
+                    ? VARIANT_TONES[v] + " shadow-glow"
+                    : "border-white/15 bg-white/[0.03] text-ink-200 hover:bg-white/[0.07]"
                 }`}
               >
+                <span className={`h-2 w-2 rounded-full ${VARIANT_DOT_TONES[v]}`} />
                 {VARIANT_LABELS[v]}
               </button>
             );
           })}
         </div>
-        <div className="flex items-center justify-between gap-3 flex-wrap mb-2">
-          <div className="text-[10.5px] uppercase tracking-wider text-ink-400 font-semibold">
+        <div className="mb-3 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2">
+          <div className="text-[10px] uppercase tracking-wider text-flame-400 font-bold mb-0.5">
+            now showing · {VARIANT_LABELS[activeVariant]}
+          </div>
+          <div className="text-[12px] text-ink-200">
+            {VARIANT_DESCRIPTIONS[activeVariant]}
+          </div>
+          <div className="mt-1 text-[10.5px] text-ink-400">
             {after.label}
           </div>
-          <span className="text-[10px] uppercase tracking-[0.16em] text-ink-400 font-semibold">
-            {VARIANT_DESCRIPTIONS[activeVariant]}
-          </span>
         </div>
         <div className="mt-2 rounded-xl border border-mint-500/20 bg-mint-500/[0.04] overflow-hidden">
           {/* Email-style header */}
