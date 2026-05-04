@@ -18,6 +18,7 @@ export type UpgradeCard = {
   hero: string;
   kind: CardKind;
   headline: string;
+  p0_notice?: string;
   pills: { audience: string; trigger: string; kpi: string };
   diagnosis: {
     state: UpgradeState;
@@ -253,6 +254,8 @@ export const CARDS: UpgradeCard[] = [
     kind: "upgrade",
     headline:
       "PRODUCTION DEFECT: winners' claim links are malformed Liquid. AND the email has no voice. Fix today, upgrade after.",
+    p0_notice:
+      "The Liquid URL fix (template 1133) ships TODAY regardless of your vote — this is a production defect affecting live users right now. Your vote on this card is about the voice upgrade only.",
     pills: {
       audience: "Fast Break players · daily result delivery · onboarding-first-win cohort",
       trigger: "Fast Break result event · daily during NBA season",

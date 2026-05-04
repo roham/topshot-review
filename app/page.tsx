@@ -79,7 +79,15 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="mt-10 text-left max-w-md mx-auto">
+          {/* Matt's visual philosophy framing */}
+          <div className="mt-10 rounded-2xl border border-amber-500/30 bg-amber-500/[0.04] px-4 py-4 text-left max-w-md mx-auto">
+            <div className="text-[10.5px] uppercase tracking-wider text-amber-400 font-semibold mb-2">Context before you swipe</div>
+            <p className="text-[13px] text-ink-200 leading-relaxed">
+              These cards propose <span className="text-ink-50 font-medium">copy + personalization strategy</span> — not final HTML design. Matt&apos;s instinct (&ldquo;no one reads; images and video everywhere&rdquo;) and these proposals aren&apos;t opposed: Magic owns the content layer, the design team wraps it. Vote on whether the <em>content</em> is right. Visual execution is a separate conversation.
+            </p>
+          </div>
+
+          <div className="mt-6 text-left max-w-md mx-auto">
             <div className="text-[10.5px] uppercase tracking-wider text-ink-400 font-semibold mb-2">
               The seven, in priority order
             </div>

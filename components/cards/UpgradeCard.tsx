@@ -75,6 +75,17 @@ export function UpgradeCard({ card }: { card: TUpgradeCard }) {
         </div>
       </div>
 
+      {/* P0 notice */}
+      {card.p0_notice && (
+        <div className="mx-5 mt-4 rounded-xl border border-rose-500/50 bg-rose-500/10 px-3.5 py-3 flex gap-2.5">
+          <span className="text-rose-400 text-[15px] leading-none shrink-0 mt-[1px]">⚠</span>
+          <p className="text-[13px] text-rose-200 leading-[1.5]">
+            <span className="font-semibold">P0 ships today. </span>
+            {card.p0_notice}
+          </p>
+        </div>
+      )}
+
       {/* Headline */}
       <div className="px-5 pt-5 pb-4 border-b border-white/5">
         <p className="text-[15px] sm:text-base text-ink-100 leading-snug text-pretty">
