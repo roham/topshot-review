@@ -868,7 +868,7 @@ export const CARDS: UpgradeCard[] = [
         label: "Frame A — Almanac · Abandoned cart with comp-band evidence",
         from: "NBA Top Shot <marketplace@nbatopshot.com>",
         emailHero: {
-          src: "https://assets.nbatopshot.com/media/{{event.momentFlowID}}/image",
+          src: "{{event.moment_image_url}}",
           alt: "{{event.player}} {{event.playCategory}} Moment",
           liquidCaption: "{{event.setName}} · serial #{{event.serial}}",
         },
@@ -897,7 +897,7 @@ export const CARDS: UpgradeCard[] = [
         label: "Frame B — Cinematic · Abandoned Cart",
         from: "NBA Top Shot <drops@nbatopshot.com>",
         emailHero: {
-          src: "https://assets.nbatopshot.com/media/{{event.momentFlowID}}/image",
+          src: "{{event.moment_image_url}}",
           alt: "{{event.player}} {{event.playCategory}} Moment",
           liquidCaption: "Dynamic Moment hero — full-bleed Moment image",
         },
@@ -921,7 +921,7 @@ export const CARDS: UpgradeCard[] = [
         label: "Frame C — Brief · Open Order",
         from: "NBA Top Shot Marketplace <market@nbatopshot.com>",
         emailHero: {
-          src: "https://assets.nbatopshot.com/media/{{event.momentFlowID}}/image",
+          src: "{{event.moment_image_url}}",
           alt: "{{event.player}} {{event.playCategory}} Moment thumbnail",
           liquidCaption: "Dynamic Moment thumbnail; small inline, not full-bleed",
         },
