@@ -65,13 +65,13 @@ export function renderEmail(args: RenderArgs): JSX.Element {
     case "whale-tier":
       return <WhaleTierTemplate {...args} />;
     case "reactivation":
-      return <ReactivationTemplateStub {...args} />;
+      return <ReactivationTemplate {...args} />;
     case "fast-break":
-      return <FastBreakTemplateStub {...args} />;
+      return <FastBreakTemplate {...args} />;
     case "drop-announcement":
-      return <DropAnnouncementTemplateStub {...args} />;
+      return <DropAnnouncementTemplate {...args} />;
     case "abandoned-cart":
-      return <AbandonedCartTemplateStub {...args} />;
+      return <AbandonedCartTemplate {...args} />;
   }
 }
 
@@ -876,70 +876,615 @@ function WhaleTierTemplate({ variant, after, ctx, mode }: RenderArgs) {
 }
 
 // ===================================================================
-// Template 3 — Reactivation Drip (STUB)
+// Template 3 — Reactivation Drip (FULL)
 //
-// TODO: portfolio-statement layout — top stripe with Moments-owned-since,
-// then a personalized 3-Moment stack (each Moment row has player, set,
-// serial, bought-at, floor-today, mini sparkline), market-context para,
-// dual CTA (View collection / See full marketplace tape).
-// Lead color: amber (financial-statement register).
-// Engineering hook: customer.notable_holdings_moving must support negative
-// deltas without filtering.
-//
-// For now, falls back to the v1003 generic shell so the review surface
-// keeps working.
+// Portfolio-statement layout. Lead color: amber.
 // ===================================================================
 
-function ReactivationTemplateStub(args: RenderArgs) {
-  return <GenericShellTemplate {...args} accent="amber" templateId="reactivation" />;
+function ReactivationTemplate({ variant, after, ctx, mode }: RenderArgs) {
+  const subject = resolveOrRaw(after.subject, ctx, mode);
+  const preheader = resolveOrRaw(after.preheader, ctx, mode);
+  const cta = resolveOrRaw(after.cta, ctx, mode);
+  const isLiquid = mode === "liquid";
+  const isCinematic = variant === "cinematic";
+  const isBrief = variant === "brief";
+
+  const customer = (ctx.customer as Record<string, unknown> | undefined) ?? {};
+  const holdings = (customer.notable_holdings_moving as Record<string, string>[] | undefined) ?? [];
+
+  const heroAspect = isCinematic ? "4/3" : isBrief ? "16/9" : "16/5";
+
+  return (
+    <TemplateOuter mode={mode} templateId="reactivation" variant={variant}>
+      <ModeBadge mode={mode} accent="amber" />
+      <MockPersonaBadge ctx={ctx} mode={mode} />
+      <EmailHeader from={after.from} ctx={ctx} mode={mode} />
+      <SubjectPreheader subject={subject} preheader={preheader} mode={mode} />
+      <BrandHeader />
+
+      {/* Hero image — thin banner for v1001/almanac, larger for cinematic/brief */}
+      <HeroImage after={after} ctx={ctx} mode={mode} aspect={heroAspect} />
+
+      {/* Cinematic: 3 callout pills in amber */}
+      {isCinematic && after.callouts && (
+        <div className="mx-3 mt-3 grid grid-cols-3 gap-2">
+          {after.callouts.slice(0, 3).map((c, i) => (
+            <div
+              key={i}
+              className="rounded-md border border-amber-500/30 bg-amber-500/[0.05] px-2 py-2 text-center"
+            >
+              <div className="text-[9px] uppercase tracking-wider text-amber-300 font-semibold">
+                {isLiquid ? c.label : resolveLiquidString(c.label, ctx)}
+              </div>
+              <div
+                className={`mt-1 ${
+                  isLiquid
+                    ? "font-mono text-[10px] text-amber-200"
+                    : "text-[11px] font-mono text-ink-100"
+                }`}
+              >
+                {isLiquid ? c.value : resolveLiquidString(c.value, ctx)}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Portfolio stripe — non-cinematic, non-brief */}
+      {!isCinematic && !isBrief && (
+        <div className="mx-3 mt-3 rounded-lg border border-amber-500/25 bg-amber-500/[0.04] px-4 py-2.5">
+          {isLiquid ? (
+            <div className="font-mono text-[11px] text-amber-300">
+              {"{{customer.lifetime_moments_owned}} Moments · since {{customer.first_session_at | date: \"%Y\"}} · last seen {{customer.last_session_days_ago}}d ago"}
+            </div>
+          ) : (
+            <div className="font-mono text-[12px] text-amber-200">
+              {customer.lifetime_moments_owned != null
+                ? String(customer.lifetime_moments_owned)
+                : "—"}{" "}
+              Moments · since{" "}
+              {customer.first_session_at
+                ? new Date(customer.first_session_at as string).getFullYear()
+                : "—"}{" "}
+              · last seen{" "}
+              {customer.last_session_days_ago != null
+                ? String(customer.last_session_days_ago)
+                : "—"}
+              d ago
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Brief: CalloutGrid amber instead of moment stack */}
+      {isBrief && after.callouts && (
+        <CalloutGrid callouts={after.callouts} ctx={ctx} mode={mode} accent="amber" />
+      )}
+
+      {/* Non-cinematic, non-brief: Moment stack or liquid loop preview */}
+      {!isCinematic && !isBrief && (
+        <div className="mx-3 mt-3 rounded-lg border border-amber-500/20 overflow-hidden">
+          {isLiquid ? (
+            <div className="px-3 py-3 font-mono text-[10.5px] text-amber-300 whitespace-pre-wrap leading-relaxed">
+              {`{% for moment in customer.notable_holdings_moving %}\n  {{moment.player}} · {{moment.set}} · #{{moment.serial}}\n  Bought {{moment.bought_at | date: "%b %Y"}} at {{moment.bought_price}} · Floor: {{moment.floor_today}} · {{moment.pct_change}}\n{% endfor %}`}
+            </div>
+          ) : (
+            <div className="divide-y divide-amber-500/10">
+              {holdings.slice(0, 3).map((m, i) => {
+                const isPositive = (m.pct_change ?? "").startsWith("+");
+                return (
+                  <div key={i} className="px-3 py-2.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="text-[13px] font-semibold text-ink-100">{m.player}</div>
+                      <div
+                        className={`text-[13px] font-bold font-mono ${
+                          isPositive ? "text-mint-400" : "text-red-400"
+                        }`}
+                      >
+                        {m.pct_change}
+                      </div>
+                    </div>
+                    <div className="mt-0.5 flex items-center gap-2">
+                      <div className="rounded px-1.5 py-0.5 bg-amber-500/10 border border-amber-500/20 text-[10.5px] font-mono text-amber-400">
+                        {m.set} · #{m.serial}
+                      </div>
+                    </div>
+                    <div className="mt-0.5 text-[10px] font-mono text-ink-400">
+                      {m.bought_price} → {m.floor_today}
+                    </div>
+                    {m.recent_comp && (
+                      <div className="text-[10px] font-mono text-ink-500">
+                        Last comp: {m.recent_comp}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+              {holdings.length === 0 && (
+                <div className="px-3 py-3 text-[11px] text-ink-500 font-mono italic">
+                  No holdings data available
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* v1001/almanac non-brief: amber callout grid */}
+      {(variant === "v1001" || variant === "almanac") && after.callouts && (
+        <CalloutGrid callouts={after.callouts} ctx={ctx} mode={mode} accent="amber" />
+      )}
+
+      <BodyParagraphs body={after.body} ctx={ctx} mode={mode} />
+      <PrimaryCta label={cta} mode={mode} uppercase={isCinematic} />
+      {!isCinematic && <GhostCtaLink label="See full marketplace tape" mode={mode} />}
+      <BrandFooter mode={mode} />
+    </TemplateOuter>
+  );
 }
 
 // ===================================================================
-// Template 4 — Fast Break Daily Result (STUB)
+// Template 4 — Fast Break Daily Result (FULL)
 //
-// TODO: ESPN-scoreboard layout — top is a scoreboard header (lineup,
-// score, rank in giant numerals), 5-cell lineup grid below (player tiles
-// with tonight's points), pack-claim row with countdown, streak stats
-// footer. Dual CTA (Claim pack / Set tomorrow's lineup).
-// Lead color: saturated mint (win state).
-// PRODUCTION FIX still ships day-one regardless: broken Liquid URL +
-// "a NBA" subject grammar.
-// gpt-image-2 needed: generic Fast Break tier reveal hero with lineup
-// positions visible (cinematic variant).
+// ESPN-scoreboard layout. Lead color: saturated mint.
 // ===================================================================
 
-function FastBreakTemplateStub(args: RenderArgs) {
-  return <GenericShellTemplate {...args} accent="mint" templateId="fast-break" />;
+function FastBreakTemplate({ variant, after, ctx, mode }: RenderArgs) {
+  const subject = resolveOrRaw(after.subject, ctx, mode);
+  const preheader = resolveOrRaw(after.preheader, ctx, mode);
+  const cta = resolveOrRaw(after.cta, ctx, mode);
+  const isLiquid = mode === "liquid";
+  const isCinematic = variant === "cinematic";
+  const isBrief = variant === "brief";
+
+  const customer = (ctx.customer as Record<string, unknown> | undefined) ?? {};
+  const event = (ctx.event as Record<string, unknown> | undefined) ?? {};
+
+  const showScoreboard = !isBrief;
+  const showLineupGrid = (variant === "v1001" || variant === "almanac") && !isLiquid;
+
+  const lineupStr = (event.lineupPlayers as string | undefined) ?? "";
+  const lineupParts = lineupStr ? lineupStr.split(" · ") : [];
+
+  return (
+    <TemplateOuter mode={mode} templateId="fast-break" variant={variant}>
+      <ModeBadge mode={mode} accent="mint" />
+      <MockPersonaBadge ctx={ctx} mode={mode} />
+      <EmailHeader from={after.from} ctx={ctx} mode={mode} />
+      <SubjectPreheader subject={subject} preheader={preheader} mode={mode} />
+      <BrandHeader />
+
+      {isCinematic && <HeroImage after={after} ctx={ctx} mode={mode} aspect="4/3" />}
+      {isBrief && <HeroImage after={after} ctx={ctx} mode={mode} aspect="16/9" />}
+
+      {/* Scoreboard header — v1001/almanac/cinematic */}
+      {showScoreboard && (
+        <div className="mx-3 mt-3 rounded-lg border border-mint-500/25 bg-mint-500/[0.04] px-4 py-3">
+          {isLiquid ? (
+            <div className="font-mono text-[11px] text-amber-300 whitespace-pre-wrap leading-relaxed">
+              {"LINEUP: {{event.lineupPlayers}}\nSCORE: {{event.totalScore}}\n{{event.winRank}} · {{event.gameCount}} games"}
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center gap-2 mb-2">
+                <div className="text-[9px] uppercase tracking-[0.18em] font-semibold text-mint-300">
+                  Lineup
+                </div>
+                <div className="text-[11px] font-mono text-ink-300 truncate">
+                  {lineupStr || "—"}
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-[48px] font-bold font-mono text-mint-400 leading-none">
+                  {(event.totalScore as string | number | undefined) ?? "—"}
+                </div>
+                <div className="mt-1 text-[12px] font-mono text-ink-400">
+                  {(event.winRank as string | undefined) ?? "—"} ·{" "}
+                  {(event.gameCount as string | number | undefined) ?? "—"} games
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* 5-cell lineup grid — v1001/almanac rendered only */}
+      {showLineupGrid && lineupParts.length > 0 && (
+        <div
+          className="mx-3 mt-2 grid gap-1.5"
+          style={{ gridTemplateColumns: `repeat(${Math.min(lineupParts.length, 5)}, 1fr)` }}
+        >
+          {lineupParts.slice(0, 5).map((player, i) => (
+            <div
+              key={i}
+              className="flex flex-col items-center gap-1 rounded-md border border-mint-500/20 bg-mint-500/[0.03] px-1 py-2"
+            >
+              <div className="h-7 w-7 rounded-full bg-mint-500/20 border border-mint-500/30 grid place-items-center text-mint-300 text-[11px] font-bold">
+                {player.slice(0, 2)}
+              </div>
+              <div className="text-[9px] font-mono text-ink-400 text-center leading-tight">
+                {player}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Pack-claim row — non-cinematic, non-brief, rendered */}
+      {!isCinematic && !isBrief && !isLiquid && (
+        <div className="mx-3 mt-2 rounded-lg border border-mint-500/30 bg-mint-500/[0.04] px-4 py-2.5">
+          <div className="font-mono text-[11.5px] text-ink-100">
+            Pack credited · claim by{" "}
+            <span className="text-mint-300">
+              {event.claim_expires_at
+                ? new Date(event.claim_expires_at as string).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })
+                : "—"}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {(variant === "v1001" || variant === "almanac") && after.callouts && (
+        <CalloutGrid callouts={after.callouts} ctx={ctx} mode={mode} accent="mint" />
+      )}
+      {isBrief && after.callouts && (
+        <CalloutGrid callouts={after.callouts} ctx={ctx} mode={mode} accent="amber" />
+      )}
+
+      <BodyParagraphs body={after.body} ctx={ctx} mode={mode} />
+      <PrimaryCta label={cta || "Claim your pack"} mode={mode} uppercase={isCinematic} />
+      {!isBrief && <GhostCtaLink label="Set tomorrow's lineup" mode={mode} />}
+
+      {/* Streak footer — v1001/almanac rendered */}
+      {(variant === "v1001" || variant === "almanac") && !isLiquid && (
+        <div className="mx-3 mb-2 mt-1 px-3 py-2 rounded-lg border border-white/10 bg-white/[0.02] text-center">
+          <div className="font-mono text-[11px] text-ink-400">
+            <span className="text-mint-300 font-semibold">
+              {(customer.fastbreak_win_streak as string | number | undefined) ?? "—"}
+            </span>{" "}
+            win streak ·{" "}
+            <span className="text-ink-300">
+              {(customer.fastbreak_lifetime_wins as string | number | undefined) ?? "—"}
+            </span>{" "}
+            lifetime
+          </div>
+        </div>
+      )}
+
+      <BrandFooter mode={mode} />
+    </TemplateOuter>
+  );
 }
 
 // ===================================================================
-// Template 5 — Drop Announcement (STUB)
+// Template 5 — Drop Announcement (FULL)
 //
-// TODO: theatrical poster layout — full-bleed drop art (curator-supplied),
-// big legend headline, three vertical anticipation cards (When/What/How),
-// dual CTA (Set reminder / Add to calendar). NO callout grid in dominant
-// variants. Brief variant uses small datacard.
-// Lead color: flame-heavy.
+// Theatrical poster layout. Lead color: flame (heavy).
 // ===================================================================
 
-function DropAnnouncementTemplateStub(args: RenderArgs) {
-  return <GenericShellTemplate {...args} accent="flame" templateId="drop-announcement" />;
+function DropAnnouncementTemplate({ variant, after, ctx, mode }: RenderArgs) {
+  const subject = resolveOrRaw(after.subject, ctx, mode);
+  const preheader = resolveOrRaw(after.preheader, ctx, mode);
+  const cta = resolveOrRaw(after.cta, ctx, mode);
+  const isLiquid = mode === "liquid";
+  const isCinematic = variant === "cinematic";
+  const isBrief = variant === "brief";
+  const isV1001orAlmanac = variant === "v1001" || variant === "almanac";
+
+  const drop = (ctx.drop as Record<string, unknown> | undefined) ?? {};
+
+  const formatDropTime = (dateStr: unknown) => {
+    if (!dateStr) return "—";
+    try {
+      const d = new Date(dateStr as string);
+      return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }) +
+        " · " + d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZoneName: "short" });
+    } catch {
+      return String(dateStr);
+    }
+  };
+
+  const formatQueueTime = (dateStr: unknown) => {
+    if (!dateStr) return "—";
+    try {
+      const d = new Date(dateStr as string);
+      return d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZoneName: "short" });
+    } catch {
+      return String(dateStr);
+    }
+  };
+
+  const liveAtFormatted = formatDropTime(drop.live_at);
+  const queueTimeFormatted = formatQueueTime(drop.queue_open_at);
+
+  const legendText = isLiquid
+    ? "{{drop.featured_player_legend}}"
+    : (drop.featured_player_legend as string | undefined) ?? "";
+
+  return (
+    <TemplateOuter mode={mode} templateId="drop-announcement" variant={variant}>
+      <ModeBadge mode={mode} accent="flame" />
+      <MockPersonaBadge ctx={ctx} mode={mode} />
+      <EmailHeader from={after.from} ctx={ctx} mode={mode} />
+      <SubjectPreheader subject={subject} preheader={preheader} mode={mode} />
+      <BrandHeader />
+
+      {/* Full-bleed poster hero */}
+      <HeroImage after={after} ctx={ctx} mode={mode} aspect={isBrief ? "16/9" : "16/10"} />
+
+      {/* Legend headline — non-brief */}
+      {!isBrief && (
+        <div className="mx-3 mt-3 px-4 py-3 rounded-lg border border-flame-500/20 bg-flame-500/[0.04]">
+          {isLiquid ? (
+            <div className="font-mono text-[11px] text-amber-300">
+              {"{{drop.featured_player_legend}}"}
+            </div>
+          ) : (
+            <div className="text-[17px] font-semibold text-balance leading-snug text-ink-50">
+              {legendText || " "}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Anticipation cards — v1001/almanac */}
+      {isV1001orAlmanac && (
+        <div className="mx-3 mt-3 grid grid-cols-3 gap-2">
+          {/* When */}
+          <div className="rounded-md border border-flame-500/25 bg-flame-500/[0.04] px-2 py-3 text-center">
+            <div className="text-[9px] uppercase tracking-wider text-flame-300 font-semibold">When</div>
+            {isLiquid ? (
+              <div className="mt-1 text-[10px] font-mono text-amber-200">
+                {"{{drop.live_at | date: \"%a %b %-d\"}}"}
+              </div>
+            ) : (
+              <>
+                <div className="mt-1 text-[11px] font-mono text-ink-100">
+                  {liveAtFormatted}
+                </div>
+                <div className="text-[9.5px] font-mono text-ink-400 mt-0.5">
+                  Queue opens {queueTimeFormatted}
+                </div>
+              </>
+            )}
+          </div>
+          {/* What */}
+          <div className="rounded-md border border-flame-500/25 bg-flame-500/[0.04] px-2 py-3 text-center">
+            <div className="text-[9px] uppercase tracking-wider text-flame-300 font-semibold">What</div>
+            {isLiquid ? (
+              <div className="mt-1 text-[10px] font-mono text-amber-200">
+                {"{{drop.set_name}} · {{drop.tier}} · {{drop.circulation_total}}"}
+              </div>
+            ) : (
+              <div className="mt-1 text-[11px] font-mono text-ink-100">
+                {[
+                  drop.set_name as string | undefined,
+                  drop.tier as string | undefined,
+                  drop.circulation_total as string | undefined,
+                ]
+                  .filter(Boolean)
+                  .join(" · ") || "—"}
+              </div>
+            )}
+          </div>
+          {/* How */}
+          <div className="rounded-md border border-flame-500/25 bg-flame-500/[0.04] px-2 py-3 text-center">
+            <div className="text-[9px] uppercase tracking-wider text-flame-300 font-semibold">How</div>
+            {isLiquid ? (
+              <div className="mt-1 text-[10px] font-mono text-amber-200">
+                {"{{drop.starting_price}} · fair-allocation queue"}
+              </div>
+            ) : (
+              <div className="mt-1 text-[11px] font-mono text-ink-100">
+                {(drop.starting_price as string | undefined) ?? "—"} · fair-allocation queue
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Cinematic: compact time+supply line */}
+      {isCinematic && (
+        <div className="mx-3 mt-3 px-4 py-2.5 rounded-lg border border-flame-500/20 bg-flame-500/[0.04]">
+          {isLiquid ? (
+            <div className="font-mono text-[11px] text-amber-300">
+              {"{{drop.live_at | date: \"%A\"}} {{drop.live_at | date: \"%l:%M %p\"}} ET · {{drop.circulation_total}} packs · queue opens {{drop.queue_open_at | date: \"%l:%M %p\"}}"}
+            </div>
+          ) : (
+            <div className="font-mono text-[12px] text-ink-100">
+              {liveAtFormatted} · {(drop.circulation_total as string | undefined) ?? "—"} packs · queue opens {queueTimeFormatted}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* CalloutGrid — flame for v1001/almanac; amber for brief */}
+      {isV1001orAlmanac && after.callouts && (
+        <CalloutGrid callouts={after.callouts} ctx={ctx} mode={mode} accent="flame" />
+      )}
+      {isBrief && after.callouts && (
+        <CalloutGrid callouts={after.callouts} ctx={ctx} mode={mode} accent="amber" />
+      )}
+
+      <BodyParagraphs body={after.body} ctx={ctx} mode={mode} />
+      <PrimaryCta label={cta || "Set a reminder"} mode={mode} uppercase={isCinematic} />
+      <GhostCtaLink label="Add to calendar" mode={mode} />
+      <BrandFooter mode={mode} />
+    </TemplateOuter>
+  );
 }
 
 // ===================================================================
-// Template 6 — Abandoned Cart (STUB)
+// Template 6 — Abandoned Cart (FULL)
 //
-// TODO: Moment-as-hero, social-proof-as-spine. Single Moment thumbnail at
-// medium scale (framed card, ~3:4), social-proof block below ("3 collectors
-// bought {{event.player}} Moments from this set in the last 24h"), comp-band
-// evidence list, listing-still-open status row, dual CTA (Finish purchase /
-// Browse this set).
-// Lead color: mint (calm).
-// Engineering hook: event.cohort_recent_buyers_count, event.recent_buyer_avatars.
+// Moment-as-hero, social-proof-as-spine. Lead color: mint (calm).
 // ===================================================================
 
-function AbandonedCartTemplateStub(args: RenderArgs) {
-  return <GenericShellTemplate {...args} accent="mint" templateId="abandoned-cart" />;
+function AbandonedCartTemplate({ variant, after, ctx, mode }: RenderArgs) {
+  const subject = resolveOrRaw(after.subject, ctx, mode);
+  const preheader = resolveOrRaw(after.preheader, ctx, mode);
+  const cta = resolveOrRaw(after.cta, ctx, mode);
+  const isLiquid = mode === "liquid";
+  const isCinematic = variant === "cinematic";
+  const isBrief = variant === "brief";
+
+  const event = (ctx.event as Record<string, unknown> | undefined) ?? {};
+
+  const socialProof = (event.social_proof as Record<string, unknown> | undefined) ?? {};
+  const recentBandSales =
+    (event.recent_serial_band_sales as Record<string, string>[] | undefined) ?? [];
+
+  const momentImageSrc =
+    (event.moment_image_url as string | undefined) ?? HERO_PLACEHOLDER;
+  const playerName = (event.player_name as string | undefined) ?? "Player";
+  const playCategory = (event.play_category as string | undefined) ?? "";
+  const serial = (event.serial as string | number | undefined) ?? "";
+
+  return (
+    <TemplateOuter mode={mode} templateId="abandoned-cart" variant={variant}>
+      <ModeBadge mode={mode} accent="mint" />
+      <MockPersonaBadge ctx={ctx} mode={mode} />
+      <EmailHeader from={after.from} ctx={ctx} mode={mode} />
+      <SubjectPreheader subject={subject} preheader={preheader} mode={mode} />
+      <BrandHeader />
+
+      {/* Framed Moment thumbnail — non-brief, non-cinematic */}
+      {!isBrief && !isCinematic && (
+        <div className="mx-6 mt-3 rounded-xl overflow-hidden border border-mint-500/25 bg-ink-950">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={momentImageSrc}
+            alt={`${playerName} Moment`}
+            className="w-full block"
+            style={{ aspectRatio: "3/4" }}
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = HERO_PLACEHOLDER;
+            }}
+          />
+          <div className="px-3 py-2 bg-black/60 border-t border-white/10">
+            <div className="text-[13px] font-semibold text-ink-100">{playerName}</div>
+            <div className="text-[11px] font-mono text-ink-400">
+              {playCategory}
+              {serial ? ` · #${serial}` : ""}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Brief: small inline hero */}
+      {isBrief && <HeroImage after={after} ctx={ctx} mode={mode} aspect="16/9" />}
+      {/* Cinematic: 4/3 hero */}
+      {isCinematic && <HeroImage after={after} ctx={ctx} mode={mode} aspect="4/3" />}
+
+      {/* Cinematic: 3 callout pills (mint accent) */}
+      {isCinematic && after.callouts && (
+        <div className="mx-3 mt-3 grid grid-cols-3 gap-2">
+          {after.callouts.slice(0, 3).map((c, i) => (
+            <div
+              key={i}
+              className="rounded-md border border-mint-500/30 bg-mint-500/[0.05] px-2 py-2 text-center"
+            >
+              <div className="text-[9px] uppercase tracking-wider text-mint-300 font-semibold">
+                {isLiquid ? c.label : resolveLiquidString(c.label, ctx)}
+              </div>
+              <div
+                className={`mt-1 ${
+                  isLiquid
+                    ? "font-mono text-[10px] text-amber-200"
+                    : "text-[11px] font-mono text-ink-100"
+                }`}
+              >
+                {isLiquid ? c.value : resolveLiquidString(c.value, ctx)}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Social proof block — non-cinematic, non-brief */}
+      {!isCinematic && !isBrief && (
+        <div className="mx-3 mt-3 rounded-lg border border-mint-500/20 bg-mint-500/[0.04] px-4 py-3">
+          {isLiquid ? (
+            <div className="font-mono text-[10.5px] text-amber-300 whitespace-pre-wrap leading-relaxed">
+              {"{{event.social_proof.sample_player_sales_24h}} collectors bought {{event.social_proof.sample_player}} Moments in the last 24h\nAvg clear: {{event.social_proof.sample_player_avg_24h_usd}} · top: {{event.social_proof.sample_player_max_24h_usd}}"}
+            </div>
+          ) : (
+            <>
+              <div className="text-[11.5px] text-ink-100">
+                <span className="font-bold font-mono text-mint-300">
+                  {(socialProof.sample_player_sales_24h as string | undefined) ?? "—"}
+                </span>
+                {" collectors bought "}
+                <span className="font-semibold">
+                  {(socialProof.sample_player as string | undefined) ?? "—"}
+                </span>
+                {" Moments in the last 24h"}
+              </div>
+              <div className="mt-1 text-[10.5px] text-ink-400 font-mono">
+                Avg clear: {(socialProof.sample_player_avg_24h_usd as string | undefined) ?? "—"} · top:{" "}
+                {(socialProof.sample_player_max_24h_usd as string | undefined) ?? "—"}
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Comp-band evidence — non-cinematic, non-brief */}
+      {!isCinematic && !isBrief && (
+        <div className="mx-3 mt-2 px-3 py-2.5 rounded-lg border border-white/10 bg-white/[0.02]">
+          {isLiquid ? (
+            <div className="font-mono text-[10.5px] text-amber-300 whitespace-pre-wrap leading-relaxed">
+              {"{% for sale in event.recent_serial_band_sales %}\n  Serials {{sale.serial_range}} cleared {{sale.amount}} on {{sale.sold_at | date: \"%b %-d\"}}\n{% endfor %}"}
+            </div>
+          ) : recentBandSales.length > 0 ? (
+            <div className="space-y-1">
+              {recentBandSales.map((sale, i) => (
+                <div key={i} className="text-[11px] font-mono text-ink-300">
+                  {"• Serials "}{sale.serial_range}{" cleared "}{sale.amount}{" on "}
+                  {sale.sold_at
+                    ? new Date(sale.sold_at).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                      })
+                    : sale.sold_at}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-[11px] font-mono text-ink-500 italic">No recent comp data</div>
+          )}
+        </div>
+      )}
+
+      {/* Listing-still-open status row — rendered, non-cinematic */}
+      {!isCinematic && !isLiquid && (
+        <div className="mx-3 mt-2 flex items-center gap-2 px-3 py-2 rounded-lg border border-white/10 bg-white/[0.02]">
+          <div className="h-2 w-2 rounded-full bg-mint-400 flex-shrink-0" />
+          <div className="text-[11px] font-mono text-ink-300">
+            Listing intact · still available on the Marketplace
+          </div>
+        </div>
+      )}
+
+      {/* CalloutGrid — mint for v1001/almanac; amber for brief */}
+      {(variant === "v1001" || variant === "almanac") && after.callouts && (
+        <CalloutGrid callouts={after.callouts} ctx={ctx} mode={mode} accent="mint" />
+      )}
+      {isBrief && after.callouts && (
+        <CalloutGrid callouts={after.callouts} ctx={ctx} mode={mode} accent="amber" />
+      )}
+
+      <BodyParagraphs body={after.body} ctx={ctx} mode={mode} />
+      <PrimaryCta label={cta || "Finish your purchase"} mode={mode} uppercase={isCinematic} />
+      <GhostCtaLink label="Browse this set" mode={mode} />
+      <BrandFooter mode={mode} />
+    </TemplateOuter>
+  );
 }
 
 // ===================================================================
