@@ -1,0 +1,324 @@
+import type { UpgradeCard as TUpgradeCard, UpgradeState } from "@/lib/cards";
+
+const STATE_LABEL: Record<UpgradeState, string> = {
+  "stopped": "STOPPED",
+  "broken-in-prod": "BROKEN IN PROD",
+  "missing": "MISSING",
+  "running-flat": "RUNNING · FLAT",
+};
+
+const STATE_TONE: Record<UpgradeState, string> = {
+  "stopped": "border-rose-500/50 bg-rose-500/15 text-rose-300",
+  "broken-in-prod": "border-rose-600 bg-rose-600/25 text-rose-200 animate-pulse",
+  "missing": "border-amber-500/50 bg-amber-500/15 text-amber-300",
+  "running-flat": "border-amber-500/40 bg-amber-500/10 text-amber-200",
+};
+
+// Render markdown-ish bold (**text**) as <strong>; preserve linebreaks elsewhere.
+function MdLine({ text }: { text: string }) {
+  const parts: (string | { bold: string })[] = [];
+  let i = 0;
+  const re = /\*\*(.+?)\*\*/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text))) {
+    if (m.index > i) parts.push(text.slice(i, m.index));
+    parts.push({ bold: m[1] });
+    i = m.index + m[0].length;
+  }
+  if (i < text.length) parts.push(text.slice(i));
+  return (
+    <>
+      {parts.map((p, k) =>
+        typeof p === "string" ? (
+          <span key={k}>{p}</span>
+        ) : (
+          <strong key={k} className="font-semibold text-ink-50">
+            {p.bold}
+          </strong>
+        )
+      )}
+    </>
+  );
+}
+
+export function UpgradeCard({ card }: { card: TUpgradeCard }) {
+  return (
+    <article className="w-full max-w-[640px] mx-auto bg-ink-900/95 border border-white/10 rounded-3xl shadow-card overflow-hidden">
+      {/* Hero */}
+      <div className="relative w-full aspect-[3/2] bg-ink-950 overflow-hidden">
+        <img
+          src={card.hero}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover opacity-90"
+          loading="eager"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/40 to-transparent" />
+        <div className="absolute top-4 left-4 flex items-center gap-2">
+          <span className="px-2.5 py-1 rounded-full bg-flame-500/95 text-white text-[11px] font-semibold tracking-wider uppercase">
+            {card.position} of 7
+          </span>
+          <span
+            className={`px-2.5 py-1 rounded-full border text-[10.5px] font-semibold tracking-wider uppercase ${
+              STATE_TONE[card.diagnosis.state]
+            }`}
+          >
+            {STATE_LABEL[card.diagnosis.state]}
+          </span>
+        </div>
+        <div className="absolute bottom-5 left-5 right-5">
+          <div className="text-[11px] uppercase tracking-[0.18em] text-flame-300 font-semibold">
+            Customer.io upgrade · v1000
+          </div>
+          <h2 className="mt-1.5 font-display text-2xl sm:text-3xl font-semibold tracking-tight text-ink-50 leading-[1.1] text-balance">
+            {card.stack_item}
+          </h2>
+        </div>
+      </div>
+
+      {/* Headline */}
+      <div className="px-5 pt-5 pb-4 border-b border-white/5">
+        <p className="text-[15px] sm:text-base text-ink-100 leading-snug text-pretty">
+          {card.headline}
+        </p>
+      </div>
+
+      {/* Pills */}
+      <div className="px-5 pt-4 pb-5 grid grid-cols-1 sm:grid-cols-3 gap-2.5 border-b border-white/5">
+        <Pill label="Audience" value={card.pills.audience} tone="audience" />
+        <Pill label="Trigger" value={card.pills.trigger} tone="trigger" />
+        <Pill label="KPI" value={card.pills.kpi} tone="kpi" />
+      </div>
+
+      {/* Diagnosis */}
+      <Section title="Diagnosis">
+        <p className="text-[14px] text-ink-200 leading-[1.55] text-pretty">
+          {card.diagnosis.summary}
+        </p>
+        {card.diagnosis.facts.length > 0 && (
+          <div className="mt-4 rounded-xl border border-white/10 overflow-hidden">
+            <div className="divide-y divide-white/[0.06]">
+              {card.diagnosis.facts.map((f, i) => (
+                <div
+                  key={i}
+                  className="grid grid-cols-[minmax(120px,38%)_1fr] text-[12.5px]"
+                >
+                  <div className="px-3 py-2 bg-white/[0.025] text-ink-300 font-medium">
+                    {f.label}
+                  </div>
+                  <div className="px-3 py-2 text-ink-100 font-mono text-[12px] break-words">
+                    {f.value}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {card.diagnosis.campaigns.length > 0 && (
+          <div className="mt-4">
+            <div className="text-[10.5px] uppercase tracking-wider text-ink-400 font-semibold mb-1.5">
+              Campaigns referenced
+            </div>
+            <ul className="space-y-1.5">
+              {card.diagnosis.campaigns.map((c) => (
+                <li
+                  key={`${c.id}-${c.name}`}
+                  className="flex items-start gap-2 text-[12.5px]"
+                >
+                  <span className="font-mono text-ink-400 shrink-0 w-12">
+                    #{c.id}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-ink-100">
+                      {c.name}{" "}
+                      <span className="text-ink-400">
+                        · {c.state.toUpperCase()}
+                      </span>
+                    </div>
+                    {c.note && (
+                      <div className="text-ink-400 text-[12px]">{c.note}</div>
+                    )}
+                    {c.id > 0 && (
+                      <a
+                        href={c.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-flame-400 hover:text-flame-300 text-[11.5px] underline decoration-dotted"
+                      >
+                        verify in fly.customer.io →
+                      </a>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </Section>
+
+      {/* Before */}
+      {card.before && (
+        <Section title="What's shipping today" tone="before">
+          <div className="text-[10.5px] uppercase tracking-wider text-ink-400 font-semibold">
+            {card.before.label}
+          </div>
+          <div className="mt-2 rounded-xl border border-white/10 bg-white/[0.02] p-3 space-y-2">
+            <div>
+              <div className="text-[10px] uppercase tracking-wider text-ink-500 font-semibold mb-0.5">
+                Subject
+              </div>
+              <div className="text-[13px] text-ink-100 font-mono break-words">
+                {card.before.subject}
+              </div>
+            </div>
+            <div>
+              <div className="text-[10px] uppercase tracking-wider text-ink-500 font-semibold mb-0.5">
+                Body
+              </div>
+              <div className="text-[12.5px] text-ink-300 font-mono break-words italic">
+                {card.before.excerpt}
+              </div>
+            </div>
+          </div>
+          <p className="mt-3 text-[13px] text-ink-200 leading-relaxed text-pretty">
+            <span className="text-rose-300 font-semibold">Critique: </span>
+            {card.before.critique}
+          </p>
+        </Section>
+      )}
+
+      {/* After */}
+      <Section title="Proposed v1000 — Magic voice" tone="after">
+        <div className="text-[10.5px] uppercase tracking-wider text-ink-400 font-semibold">
+          {card.after.label}
+        </div>
+        <div className="mt-2 rounded-xl border border-mint-500/20 bg-mint-500/[0.04] overflow-hidden">
+          <div className="px-3 py-2 border-b border-mint-500/15 bg-mint-500/[0.03]">
+            <div className="flex items-center gap-2">
+              <div className="h-7 w-7 rounded-full bg-gradient-to-br from-flame-400 to-flame-600 grid place-items-center text-white text-[10.5px] font-bold flex-shrink-0">
+                M
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-[12px] text-ink-100 font-semibold truncate">
+                  {card.after.from}
+                </div>
+                <div className="text-[10.5px] text-ink-400">
+                  to {`{{customer.userName}}`}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="px-3 pt-3">
+            <div className="text-[15px] text-ink-50 font-semibold leading-snug text-balance">
+              {card.after.subject}
+            </div>
+            <div className="mt-1 text-[12px] text-ink-400 italic leading-snug">
+              {card.after.preheader}
+            </div>
+          </div>
+          <div className="px-3 pt-3 pb-4 space-y-2.5 text-[13.5px] text-ink-100 leading-[1.55]">
+            {card.after.body.map((p, i) => {
+              if (/^\{%/.test(p.trim()) || /^\{\{/.test(p.trim())) {
+                return (
+                  <p key={i} className="font-mono text-[12px] text-flame-300">
+                    {p}
+                  </p>
+                );
+              }
+              return (
+                <p key={i} className="text-pretty">
+                  <MdLine text={p} />
+                </p>
+              );
+            })}
+          </div>
+        </div>
+        {card.after.voice_notes && (
+          <p className="mt-3 text-[12.5px] text-ink-300 leading-relaxed italic text-pretty">
+            <span className="text-mint-400 not-italic font-semibold">
+              Voice notes:{" "}
+            </span>
+            {card.after.voice_notes}
+          </p>
+        )}
+      </Section>
+
+      {/* Reviewer ask */}
+      <Section title="What I need from you" tone="ask">
+        <p className="text-[14px] text-ink-100 leading-relaxed text-pretty">
+          {card.reviewer_ask}
+        </p>
+      </Section>
+
+      {/* Engineering hooks (optional, compact) */}
+      {card.engineering_hooks && card.engineering_hooks.length > 0 && (
+        <Section title="Engineering / ops hooks" tone="muted">
+          <ul className="space-y-1.5 text-[12.5px] text-ink-300">
+            {card.engineering_hooks.map((h, i) => (
+              <li key={i} className="flex gap-2">
+                <span className="text-ink-500 shrink-0">•</span>
+                <span className="leading-relaxed">
+                  <MdLine text={h} />
+                </span>
+              </li>
+            ))}
+          </ul>
+        </Section>
+      )}
+    </article>
+  );
+}
+
+function Pill({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: string;
+  tone: "audience" | "trigger" | "kpi";
+}) {
+  const colors: Record<typeof tone, string> = {
+    audience: "border-flame-500/30 bg-flame-500/[0.05] text-flame-200",
+    trigger: "border-mint-500/25 bg-mint-500/[0.04] text-mint-200",
+    kpi: "border-amber-500/30 bg-amber-500/[0.05] text-amber-200",
+  };
+  return (
+    <div className={`rounded-xl border ${colors[tone]} px-3 py-2.5`}>
+      <div className="text-[9.5px] uppercase tracking-[0.16em] font-semibold opacity-80">
+        {label}
+      </div>
+      <div className="mt-1 text-[12.5px] leading-snug text-ink-100 text-pretty">
+        {value}
+      </div>
+    </div>
+  );
+}
+
+function Section({
+  title,
+  children,
+  tone,
+}: {
+  title: string;
+  children: React.ReactNode;
+  tone?: "before" | "after" | "ask" | "muted";
+}) {
+  const tones: Record<string, string> = {
+    before: "text-rose-300",
+    after: "text-mint-300",
+    ask: "text-amber-300",
+    muted: "text-ink-400",
+  };
+  return (
+    <section className="px-5 py-5 border-b border-white/5 last:border-b-0">
+      <h3
+        className={`text-[10.5px] uppercase tracking-[0.2em] font-semibold mb-3 ${
+          tones[tone ?? "muted"] ?? "text-ink-400"
+        }`}
+      >
+        {title}
+      </h3>
+      {children}
+    </section>
+  );
+}

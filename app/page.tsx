@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { Logo } from "@/components/Logo";
 
 export default function Home() {
@@ -23,17 +22,22 @@ export default function Home() {
     <main className="min-h-[100dvh] flex flex-col">
       <header className="px-6 pt-6 pb-2 flex items-center justify-between">
         <Logo />
-        <span className="text-[11px] uppercase tracking-wider text-ink-500">v2</span>
+        <span className="text-[11px] uppercase tracking-wider text-ink-500">v1000</span>
       </header>
 
       <div className="flex-1 grid place-items-center px-6 py-10">
-        <div className="max-w-lg w-full text-center">
-          <div className="text-[10px] uppercase tracking-[0.22em] text-flame-400 font-semibold">Round 2 · Marketing review</div>
+        <div className="max-w-xl w-full text-center">
+          <div className="text-[10px] uppercase tracking-[0.22em] text-flame-400 font-semibold">
+            Customer.io rebuild · marketing review
+          </div>
           <h1 className="mt-3 font-display text-[40px] sm:text-5xl font-semibold tracking-tight text-ink-50 text-balance leading-[1.05]">
-            Tell us what to send.
+            Seven programmatic email upgrades.
           </h1>
           <p className="mt-4 text-[15px] sm:text-base text-ink-300 text-pretty leading-relaxed">
-            Real emails, social posts, and Discord messages we want to send next week to bring back longtime Top Shot collectors who've gone quiet. You'll see exactly what they'll see. For each one, tap <span className="text-mint-500 font-semibold">ship it</span>, <span className="text-rose-500 font-semibold">nope</span>, or <span className="text-amber-500 font-semibold">needs work</span>. About 3 minutes.
+            Each card is one Customer.io flow Magic wants to upgrade — grounded in live workspace data, BQ-baselined audience numbers, and a real before-vs-after.{" "}
+            For each one: <span className="text-mint-400 font-semibold">ship it</span>,{" "}
+            <span className="text-rose-400 font-semibold">nope</span>, or{" "}
+            <span className="text-amber-400 font-semibold">needs work</span>. About 10 minutes.
           </p>
 
           <div className="mt-7 max-w-sm mx-auto">
@@ -53,7 +57,10 @@ export default function Home() {
               Start reviewing
             </button>
             {stored && !name && (
-              <button onClick={() => { setStored(null); localStorage.removeItem("voter"); }} className="mt-2 text-[12px] text-ink-400 hover:text-ink-200">
+              <button
+                onClick={() => { setStored(null); localStorage.removeItem("voter"); }}
+                className="mt-2 text-[12px] text-ink-400 hover:text-ink-200"
+              >
                 Not {stored}?
               </button>
             )}
@@ -61,9 +68,9 @@ export default function Home() {
 
           <div className="mt-12 grid grid-cols-3 gap-3 text-left">
             {[
-              { n: "7", l: "Pieces" },
-              { n: "~3 min", l: "To review" },
-              { n: "Email · X · Discord", l: "Surfaces" },
+              { n: "7", l: "Upgrades" },
+              { n: "~10 min", l: "To review" },
+              { n: "Live data", l: "BQ + Customer.io" },
             ].map((x) => (
               <div key={x.l} className="rounded-2xl border border-white/10 bg-white/[0.02] p-3">
                 <div className="font-display text-[15px] sm:text-base font-semibold text-ink-50">{x.n}</div>
@@ -71,11 +78,26 @@ export default function Home() {
               </div>
             ))}
           </div>
+
+          <div className="mt-10 text-left max-w-md mx-auto">
+            <div className="text-[10.5px] uppercase tracking-wider text-ink-400 font-semibold mb-2">
+              The seven, in priority order
+            </div>
+            <ol className="space-y-1.5 text-[12.5px] text-ink-200">
+              <li><span className="text-flame-400 font-mono mr-2">1</span>Reactivation drip — 1.27M idle L1+L2, currently zero</li>
+              <li><span className="text-flame-400 font-mono mr-2">2</span>Pack Received — voice rebuild on the highest-leverage email</li>
+              <li><span className="text-flame-400 font-mono mr-2">3</span>Welcome / Onboarding — restart after 136 days dark</li>
+              <li><span className="text-flame-400 font-mono mr-2">4</span>Fast Break Daily Result — production fix + voice</li>
+              <li><span className="text-flame-400 font-mono mr-2">5</span>Drop Announcements — programmatic loop instead of 1k one-offs</li>
+              <li><span className="text-flame-400 font-mono mr-2">6</span>Abandoned Cart — voice swap, easiest win</li>
+              <li><span className="text-flame-400 font-mono mr-2">7</span>Whale-tier concierge — net-new surface for L4+ collectors</li>
+            </ol>
+          </div>
         </div>
       </div>
 
       <footer className="px-6 pb-6 text-center text-[11px] text-ink-500">
-        NBA Top Shot · Reactivation Review v1
+        NBA Top Shot · Customer.io rebuild · workspace 161112
       </footer>
     </main>
   );

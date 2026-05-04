@@ -71,8 +71,8 @@ export default function AdminPage() {
               return (
                 <div key={c.id} className="rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden">
                   <div className="px-4 py-3 flex items-baseline gap-3 flex-wrap border-b border-white/5">
-                    <span className="text-[10px] uppercase tracking-wider text-flame-400 font-semibold">{c.kind}</span>
-                    <span className="text-[14.5px] text-ink-50 font-semibold">{c.title}</span>
+                    <span className="text-[10px] uppercase tracking-wider text-flame-400 font-semibold font-mono">#{c.position}</span>
+                    <span className="text-[14.5px] text-ink-50 font-semibold">{c.stack_item}</span>
                     <span className="ml-auto text-[11px] text-ink-400 font-mono">{total} vote{total === 1 ? "" : "s"}</span>
                   </div>
                   {total > 0 && (
