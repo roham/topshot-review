@@ -5,6 +5,13 @@ import type { Card, AfterVariantId } from "@/lib/cards";
 import { REASONS } from "@/lib/cards";
 import { UpgradeCard } from "./cards/UpgradeCard";
 
+const VARIANTS: { id: AfterVariantId; label: string }[] = [
+  { id: "v1001", label: "v1001" },
+  { id: "almanac", label: "Almanac" },
+  { id: "cinematic", label: "Cinematic" },
+  { id: "brief", label: "Brief" },
+];
+
 type Vote = "ship" | "no" | "needs-work";
 
 export function SwipeDeck({ cards, voter }: { cards: Card[]; voter: string }) {
@@ -53,7 +60,7 @@ export function SwipeDeck({ cards, voter }: { cards: Card[]; voter: string }) {
       </div>
 
       {/* Scrollable card area */}
-      <div id="deck-scroll" className="flex-1 overflow-y-auto overscroll-contain px-3 py-4 pb-32">
+      <div id="deck-scroll" className="flex-1 overflow-y-auto overscroll-contain px-3 py-4 pb-44">
         <AnimatePresence mode="wait">
           <motion.div
             key={card.id}
@@ -68,7 +75,28 @@ export function SwipeDeck({ cards, voter }: { cards: Card[]; voter: string }) {
       </div>
 
       {/* Sticky action bar */}
-      <div className="absolute bottom-0 left-0 right-0 z-30 pb-[max(20px,env(safe-area-inset-bottom))] pt-4 bg-gradient-to-t from-ink-950 via-ink-950/95 to-transparent">
+      <div className="absolute bottom-0 left-0 right-0 z-30 pb-[max(20px,env(safe-area-inset-bottom))] pt-3 bg-gradient-to-t from-ink-950 via-ink-950/95 to-transparent">
+        {/* Variant selector — always visible, no scrolling needed */}
+        <div className="px-4 mb-2">
+          <div className="text-[9.5px] uppercase tracking-wider text-ink-500 font-semibold text-center mb-1.5">
+            Compare frames · tap to switch
+          </div>
+          <div className="flex items-center gap-1.5">
+            {VARIANTS.map(({ id, label }) => (
+              <button
+                key={id}
+                onClick={() => setActiveVariant(id)}
+                className={`flex-1 h-8 rounded-xl text-[11px] font-bold uppercase tracking-wider transition border ${
+                  id === activeVariant
+                    ? "border-flame-500/60 bg-flame-500/20 text-flame-300"
+                    : "border-white/10 bg-white/[0.03] text-ink-400 hover:text-ink-200 hover:bg-white/[0.06]"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="flex items-center justify-center gap-2 px-4">
           <button
             onClick={() => submit("no")}
@@ -91,8 +119,8 @@ export function SwipeDeck({ cards, voter }: { cards: Card[]; voter: string }) {
             <span className="text-mint-300 font-semibold text-[13px] tracking-wide">✓ Ship it</span>
           </button>
         </div>
-        <div className="mt-2 text-center text-[10.5px] text-ink-400 uppercase tracking-wider">
-          Voting on <span className="text-ink-200 font-semibold">{activeVariant}</span> · {card.position} of {cards.length}
+        <div className="mt-1.5 text-center text-[10.5px] text-ink-400 uppercase tracking-wider">
+          voting on <span className="text-flame-400 font-semibold">{activeVariant}</span> · {card.position} of {cards.length}
         </div>
       </div>
 
