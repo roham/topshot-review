@@ -184,6 +184,11 @@ const MARCUS_WHALE: MockContext = {
   portfolio_7d_change: "+4.2%",
   portfolio_positions_moved: "27",
   whale_chart_image_url: ASSETS.whaleChart,
+  // New v1004 whale-rebuild Liquid variable — points to the holder's own
+  // top Moment image. In production this is BQ → CIO derived (top hold →
+  // moment image URL lookup). For review, alias the abandoned-cart Moment
+  // image so the hero renders Marcus's Mitchell #2,418 in the rebuild.
+  whale_hold_image_url: ASSETS.collectorFirstPack,
 };
 
 const WEEK: MockContext = {
@@ -201,6 +206,91 @@ const MARKET: MockContext = {
   dashboard_image_url: ASSETS.marketDashboard,
 };
 
+// Social proof data — pulled live from BQ on 2026-05-04.
+// Source: /opt/magic/collect-hq/strategy/2026-05-04-social-proof-data.md
+// Per-card numbers are real and can be referenced from After-block copy in
+// future iterations. Where a signal was BLOCKED (drop sell-out timing,
+// Fast Break top 1% threshold) we either omit the field or fall back to
+// an adjacent BQ-confirmed metric.
+const SOCIAL_PROOF = {
+  // Welcome — 7 new activations last 7d is anemic; the 30d returners signal
+  // is the more compelling number for a welcome touch.
+  welcome: {
+    new_collectors_7d: "7",
+    returned_collectors_30d: "37,227",
+    marketplace_buyers_7d: "1,588",
+  },
+  // Pack Received — anchored on Rookie Revelation (the most active drop set
+  // this week per BQ). Top sale was Kon Knueppel Legendary at $2,099.
+  packReceived: {
+    set_buyers_7d: "18",
+    set_transactions_7d: "79",
+    set_volume_usd_7d: "$23,839",
+    set_top_sale_player: "Kon Knueppel",
+    set_top_sale_tier: "Legendary",
+    set_top_sale_amount: "$2,099",
+    pack_openers_7d: "1,696",
+    pack_opens_7d: "9,344",
+  },
+  // Reactivation — Dyson Daniels leads on unique-buyer breadth (601), LeBron
+  // leads on total volume (833 sales / 429 buyers).
+  reactivation: {
+    returned_collectors_30d: "37,227",
+    top_player_by_breadth: "Dyson Daniels",
+    top_player_by_breadth_buyers_30d: "601",
+    top_player_by_volume: "LeBron James",
+    top_player_by_volume_sales_30d: "833",
+    top_player_by_volume_buyers_30d: "429",
+  },
+  // Drop Announcement — sell-out timing is BLOCKED (no drop open/close
+  // timestamp in mart schema). Fall back to secondary-market velocity:
+  // Wembanyama Playoffs pack traded 501x in 7d, Bronny Playoffs has 156
+  // open offers.
+  drop: {
+    comparable_pack_secondary_txns_7d: "501",
+    comparable_pack_top_sale_usd: "$11",
+    bronny_open_offers_7d: "156",
+    bronny_top_sale_usd: "$169",
+    wemby_secondary_transactions_7d: "212",
+    // sellout_minutes: BLOCKED — see social-proof-data.md "Drop sell-out timing"
+  },
+  // Abandoned Cart — parameterized on event.player. Jaylen Brown reference
+  // numbers from Q5 (75 sales 24h, ceiling $1,500). Embiid is the most-active
+  // 24h player (107 sales) for cohort-context fallback.
+  abandonedCart: {
+    sample_player: "Jaylen Brown",
+    sample_player_sales_24h: "75",
+    sample_player_max_24h_usd: "$1,500",
+    sample_player_avg_24h_usd: "$27.76",
+    most_active_player_24h: "Joel Embiid",
+    most_active_player_sales_24h: "107",
+  },
+  // Fast Break — top 1% point threshold is BLOCKED (Atlas consumer schema
+  // not provisioned at dl-kaaos). Fall back to participation breadth:
+  // Classic Run 12 had 504 unique runners across 1,600 opens this week.
+  fastBreak: {
+    classic_run_12_unique_openers_7d: "504",
+    classic_run_12_total_opens_7d: "1,600",
+    fast_break_secondary_txns_7d: "534",
+    pack_openers_7d_platform: "1,696",
+    pack_opens_7d_platform: "9,344",
+    // top_1pct_score_threshold: BLOCKED — see social-proof-data.md "Fast Break top 1%"
+  },
+  // Whale-Tier — restrained by design. One signal: 30 collectors moved
+  // $99,759 in $1K+ transactions this week; 81 collectors / $494,487 over
+  // the 30d window.
+  whaleTier: {
+    high_value_buyers_7d: "30",
+    high_value_volume_7d_usd: "$99,759",
+    high_value_avg_transaction_usd: "$3,325",
+    high_value_buyers_30d: "81",
+    high_value_volume_30d_usd: "$494,487",
+    high_value_avg_transaction_30d_usd: "$2,875",
+    // L4/L5 formal tier label: BLOCKED — collector_score_historical stale (2023-04-24).
+    // Using $1K+ transaction threshold as proxy.
+  },
+};
+
 // ===================================================================
 // Per-card mock contexts. Keys match card IDs in lib/cards.ts.
 // ===================================================================
@@ -214,7 +304,7 @@ export const MOCK_CONTEXTS: Record<string, MockContext> = {
   "reactivation-drip": {
     customer: SARAH,
     week: WEEK,
-    market: MARKET,
+    market: { ...MARKET, social_proof: SOCIAL_PROOF.reactivation },
   },
   // Comparison — would NOT send this variant (negative math, 2022 ATH buyers):
   // "reactivation-drip-do-not-send": { customer: KAI_FLAT, week: WEEK, market: MARKET },
@@ -259,13 +349,14 @@ export const MOCK_CONTEXTS: Record<string, MockContext> = {
           sold_at: "2026-05-03T17:08:00Z",
         },
       ],
+      social_proof: SOCIAL_PROOF.packReceived,
     },
   },
 
   "welcome-onboarding": {
     customer: { ...SARAH, userName: "Alex", lifetime_moments_owned: 0 },
     week: WEEK,
-    market: MARKET,
+    market: { ...MARKET, social_proof: SOCIAL_PROOF.welcome },
   },
 
   "fast-break-result-fix": {
@@ -279,6 +370,7 @@ export const MOCK_CONTEXTS: Record<string, MockContext> = {
       fastBreakId: "fb-2026-05-03",
       claim_expires_at: "2026-05-04T23:59:00Z",
       scorecard_image_url: ASSETS.fastBreakScorecard,
+      social_proof: SOCIAL_PROOF.fastBreak,
     },
   },
 
@@ -309,6 +401,7 @@ export const MOCK_CONTEXTS: Record<string, MockContext> = {
       likely_first_movers: "Whale collectors, Cooper Flagg-set completists",
       datacard_image_url: ASSETS.dropDatacard,
       hero_image: "/cards/infographics/drop-cinematic.png",
+      social_proof: SOCIAL_PROOF.drop,
     },
     market: MARKET,
   },
@@ -346,6 +439,7 @@ export const MOCK_CONTEXTS: Record<string, MockContext> = {
           sold_at: "2026-05-01T19:15:00Z",
         },
       ],
+      social_proof: SOCIAL_PROOF.abandonedCart,
     },
   },
 
@@ -383,7 +477,17 @@ export const MOCK_CONTEXTS: Record<string, MockContext> = {
         bought_at: "2024-01-20T20:30:00Z",
         bought_price: "$112",
         floor_today: "$245",
+        // New v1004 whale-rebuild Liquid variables.
+        // gain_pct = (245 - 112) / 112 ≈ +119%.
+        gain_pct: "+119%",
+        // recent_comp_movement = 14d band-level move on the sub-3K serial range.
+        recent_comp_movement: "+30%",
+        recent_comp: "$285",
       },
+      // flagg_floor_move = weekly aggregate on Flagg pre-rookie set
+      // (used in the "three things on the desk" / "below the API" beats).
+      flagg_floor_move: "+18%",
+      social_proof: SOCIAL_PROOF.whaleTier,
     },
   },
 };

@@ -1,6 +1,7 @@
 import type { UpgradeCard as TUpgradeCard, UpgradeState, AfterVariantId, AfterBlock } from "@/lib/cards";
 import { resolveLiquidBody, resolveLiquidString, type LiquidContext } from "@/lib/liquid";
 import { MOCK_CONTEXTS } from "@/lib/mockData";
+import { renderEmail, CARD_TEMPLATE_MAP, type TemplateId } from "./templates";
 
 // ────────────────────────────────────────────────────────────
 // CONSTANTS
@@ -651,15 +652,32 @@ function LiquidView({ after }: { after: AfterBlock }) {
 // DISPATCH
 // ────────────────────────────────────────────────────────────
 
+// Templates that have been fully realized in templates.tsx — these route
+// through renderEmail() for per-template visual silhouettes. The remaining
+// four templateIds fall back to the v1003 linter (EmailV1001/Almanac/
+// Cinematic/Brief) so variants stay visually differentiated until the
+// per-template skeletons are fleshed out.
+const FULL_TEMPLATES: ReadonlySet<TemplateId> = new Set<TemplateId>([
+  "welcome",
+  "pack-received",
+  "whale-tier",
+]);
+
 function EmailRendered({
   after,
   ctx,
   variant,
+  cardId,
 }: {
   after: AfterBlock;
   ctx: LiquidContext;
   variant: AfterVariantId;
+  cardId: string;
 }) {
+  const templateId = CARD_TEMPLATE_MAP[cardId];
+  if (templateId && FULL_TEMPLATES.has(templateId)) {
+    return renderEmail({ templateId, variant, after, ctx, mode: "rendered" });
+  }
   switch (variant) {
     case "almanac":
       return <EmailAlmanac after={after} ctx={ctx} />;
@@ -796,7 +814,7 @@ export function UpgradeCard({
         </div>
 
         {/* RENDERED — variant-specific template design */}
-        <EmailRendered after={after} ctx={ctx} variant={activeVariant} />
+        <EmailRendered after={after} ctx={ctx} variant={activeVariant} cardId={card.id} />
 
         {/* LIQUID — consistent amber/monospace template view */}
         <div className="mt-4">
