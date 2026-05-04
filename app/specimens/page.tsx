@@ -11,10 +11,43 @@ type EmailSpecimen = {
   subject: string;
   preheader: string;
   from: string;
+  hero: { src: string; alt: string };
   headline: string;
   paragraphs: string[];
+  // Optional product-card block (Klaviyo cart-abandon / pack-received pattern):
+  // small image + 2-3 fact rows beneath the hero, before the body.
+  productCard?: {
+    image: string;
+    title: string;
+    rows: { label: string; value: string }[];
+  };
   cta: string;
   footerLinks?: string;
+};
+
+// Real Top Shot CDN imagery (verified 200 OK in mockData.ts) + locally-generated
+// brand visuals in /public/cards/. Reuse the same URLs the actual Customer.io
+// templates use so reviewers see the same visuals their colleagues will see.
+const IMG = {
+  packArt:
+    "https://userimg-assets.customeriomail.com/images/client-env-161112/1747166167882_03-PACKS-ARE-YOUR-DOORWAY-TO-GREATNESSNEW2_01JV5KFXMNRPTA0J24ESESYX7N.jpg",
+  setHero:
+    "https://userimg-assets.customeriomail.com/images/client-env-161112/1733254430310_04-MORE-THAN-MOMENTS_01_01JE707FKDZM5GN3VEF7G26DYG.jpg",
+  collectorFirstPack:
+    "https://userimg-assets.customeriomail.com/images/client-env-161112/1740722955824_01-NEW-COLLECTOR-FIRST-PACK2_01JN5JRSMVBKXQ9YK4ESN8FFAS.jpg",
+  packAnimated:
+    "https://userimg-assets.customeriomail.com/images/client-env-161112/1734135875841_tier4_01JF18V2BX0TMRW39EA1J2FETP.gif",
+  winExperience:
+    "https://userimg-assets.customeriomail.com/images/client-env-161112/1733248546287_01A-WIN-THE-ULTIMATE-FAN-EXPERIENCE_06_01JE6TKVN6TCK7F2VWH2RBAFBH.jpg",
+  // Locally generated infographics
+  sparkline: "/cards/infographics/sparkline-holdings.png",
+  setcard: "/cards/infographics/setcard.png",
+  momentPlaceholder: "/cards/infographics/moment-hero-placeholder.png",
+  // Brand hero PNGs
+  welcome: "/cards/welcome.png",
+  packPull: "/cards/pack-pull.png",
+  dropSeries: "/cards/drop-series.png",
+  reactivation: "/cards/reactivation.png",
 };
 
 const SPECIMENS: EmailSpecimen[] = [
@@ -25,7 +58,17 @@ const SPECIMENS: EmailSpecimen[] = [
     subject: "Jordan, your Tyrese Maxey #247/3,500 is still here",
     preheader: "Listed at $182 · 4 days since you last looked · 3,500 is the full print run",
     from: "NBA Top Shot <hello@nbatopshot.com>",
+    hero: { src: IMG.momentPlaceholder, alt: "Tyrese Maxey · Step-Back Three · Q4 vs Boston" },
     headline: "Your Tyrese Maxey is still available.",
+    productCard: {
+      image: IMG.momentPlaceholder,
+      title: "Tyrese Maxey — Step-Back Three · Q4",
+      rows: [
+        { label: "Set", value: "Playoff Push · Round 1" },
+        { label: "Serial", value: "#247 / 3,500" },
+        { label: "Listed", value: "$182" },
+      ],
+    },
     paragraphs: [
       "You saved serial #247 from the Playoff Push set — Maxey's 39-point Game 7 against Boston in the first round. That game is the reason Philadelphia is in the East Semis tonight.",
       "3,500 is the full print run. Serial #247 puts you in the bottom 7% of the run. The listing has been at $182 for four days.",
@@ -41,7 +84,17 @@ const SPECIMENS: EmailSpecimen[] = [
     subject: "Cade Cunningham Series 9 drops Wednesday at 2 PM ET",
     preheader: "8,000 packs · $29 · 6 Moments per pack · 30-minute window",
     from: "NBA Top Shot <drops@nbatopshot.com>",
+    hero: { src: IMG.packArt, alt: "Series 9 Reserve · Cade Cunningham pack art" },
     headline: "Cade Cunningham Series 9 Reserve. Wednesday, 2 PM ET.",
+    productCard: {
+      image: IMG.dropSeries,
+      title: "Series 9 Reserve",
+      rows: [
+        { label: "Mints open", value: "Wed · 2:00 PM ET" },
+        { label: "Pack price", value: "$29 · 6 Moments" },
+        { label: "Edition", value: "8,000 packs · 30-min window" },
+      ],
+    },
     paragraphs: [
       "8,000 packs. $29 each. 6 Moments per pack from a checklist anchored by Cade Cunningham, Tyrese Maxey, and Scottie Barnes.",
       "The Rare slots are Cunningham playoff performances from the Detroit comeback series — G5 (45 points, Pistons franchise playoff record) and G6 (32/10/4). There are 1,500 of each Rare. The window is 30 minutes. Limit 2 packs per account.",
@@ -57,6 +110,7 @@ const SPECIMENS: EmailSpecimen[] = [
     subject: "Sarah, welcome to NBA Top Shot",
     preheader: "You own Moments tied to real NBA games. Here's the one thing to do first.",
     from: "NBA Top Shot <welcome@nbatopshot.com>",
+    hero: { src: IMG.collectorFirstPack, alt: "Welcome to NBA Top Shot — your starter pack is in your collection" },
     headline: "You're in. Here's what this actually is.",
     paragraphs: [
       "NBA Top Shot Moments aren't videos you can download. They're digital collectibles — each one has a serial number, a print run, and an on-chain ownership record that says you own this specific one.",
@@ -73,7 +127,17 @@ const SPECIMENS: EmailSpecimen[] = [
     subject: "Marcus, here's what was in your pack",
     preheader: "1 Rare + 2 Commons · Series 9 · your Moments are ready",
     from: "NBA Top Shot <packs@nbatopshot.com>",
+    hero: { src: IMG.packAnimated, alt: "Your Series 9 pack just opened" },
     headline: "Here's your Series 9 pack.",
+    productCard: {
+      image: IMG.setcard,
+      title: "Cooper Flagg — January 21 vs. Lakers",
+      rows: [
+        { label: "Tier", value: "Rare · #156 / 1,500" },
+        { label: "Set", value: "Rookie Debut" },
+        { label: "Recent comp", value: "$38" },
+      ],
+    },
     paragraphs: [
       "You got three Moments: Cooper Flagg Rare #156/1,500 (his January 21 performance vs. the Lakers — 24 points, 9 rebounds), Tyrese Maxey Common #2,847/3,500, and Julius Randle Common #1,204/3,500.",
       "The Flagg Rare is the headline. He won Rookie of the Year this season despite Dallas missing the playoffs — first ROTY on a non-playoff team since Blake Griffin in 2010. Serial #156 puts you in the top 10% of the print run.",
@@ -89,7 +153,17 @@ const SPECIMENS: EmailSpecimen[] = [
     subject: "Your Top Shot collection since December",
     preheader: "14 Moments · current value $2,400 · the market moved",
     from: "NBA Top Shot <hello@nbatopshot.com>",
+    hero: { src: IMG.sparkline, alt: "Your collection value since December — chart" },
     headline: "Your collection since December.",
+    productCard: {
+      image: IMG.setHero,
+      title: "Cade Cunningham — biggest mover in your collection",
+      rows: [
+        { label: "December value", value: "$74" },
+        { label: "Today", value: "$312" },
+        { label: "Driver", value: "G7 vs. Magic — 32 pts, 12 ast" },
+      ],
+    },
     paragraphs: [
       "You have 14 Moments. Total market value is $2,400 based on the most recent comparable sales — up from $1,840 in December when you last logged in.",
       "Most of that movement is your Cade Cunningham Rare from the '25-26 season. It was at $74 in December. It's at $312 today. The Pistons just completed a 3-1 comeback against the Magic in Game 7 last night — Cade had 32 points and 12 assists. He's in the East Semis against Cleveland starting this week.",
@@ -140,6 +214,21 @@ function EmailPreview({ s }: { s: EmailSpecimen }) {
         <span style={{ fontSize: 11, color: "#555" }}>nbatopshot.com</span>
       </div>
 
+      {/* Hero image — full-width edge-to-edge, sets the visual anchor */}
+      <div style={{ background: "#000" }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={s.hero.src}
+          alt={s.hero.alt}
+          style={{
+            width: "100%",
+            display: "block",
+            maxHeight: 320,
+            objectFit: "cover",
+          }}
+        />
+      </div>
+
       {/* Headline */}
       <div style={{ padding: "32px 32px 0" }}>
         <p
@@ -154,6 +243,64 @@ function EmailPreview({ s }: { s: EmailSpecimen }) {
           {s.headline}
         </p>
       </div>
+
+      {/* Product card — Klaviyo-pattern image + fact rows for cart / pack / drop emails */}
+      {s.productCard && (
+        <div style={{ padding: "20px 32px 0" }}>
+          <div
+            style={{
+              display: "flex",
+              gap: 16,
+              padding: 16,
+              border: "1px solid #2a2a2a",
+              borderRadius: 6,
+              background: "#141414",
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={s.productCard.image}
+              alt={s.productCard.title}
+              style={{
+                width: 96,
+                height: 96,
+                objectFit: "cover",
+                borderRadius: 4,
+                flexShrink: 0,
+                background: "#0a0a0a",
+              }}
+            />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p
+                style={{
+                  margin: "0 0 8px",
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: "#f5f5f5",
+                  lineHeight: 1.35,
+                }}
+              >
+                {s.productCard.title}
+              </p>
+              {s.productCard.rows.map((r, i) => (
+                <div
+                  key={i}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    fontSize: 12,
+                    color: "#888",
+                    marginBottom: 3,
+                  }}
+                >
+                  <span>{r.label}</span>
+                  <span style={{ color: "#d4d4d4", fontWeight: 500 }}>{r.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Body */}
       <div style={{ padding: "20px 32px 0" }}>
