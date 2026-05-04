@@ -412,6 +412,52 @@ export const AUTORESEARCH_DEFAULTS: MockContext = {
   },
   // first_name shortcut (drafter frequently uses bare {{first_name}})
   first_name: "Sarah",
+
+  // pack-pull-recap family
+  set_name: "Rookie Debut · Cooper Flagg",
+  set_hero_image_url: "/cards/infographics/setcard.png",
+  set_page_url: "https://nbatopshot.com/sets/series-9",
+  set_slug: "series-9",
+  set_total: "15",
+  post_completion_count: "12",
+  pre_completion_count: "9",
+  pack_edition_name: "Rookie Debut Season 1 Pack",
+  pack_opened_at_pretty: "Friday, May 2",
+  pack_listing_name: "Rookie Debut Season 1",
+  threshold_band_phrase: "in the top 20% of your tier",
+  peers_completed_this_week: "47",
+  active_playoff_player_name: "Cooper Flagg",
+  cheapest_remaining_price: "$72",
+
+  // drop-announcement family
+  near_complete_set_name: "Rookie Debut · Cooper Flagg",
+  drop_open_time_local: "Wed 7:00 PM ET",
+  sets_this_drop_advances: "3",
+  closing_series_name: "Series 8",
+  drop_open_local_time: "Wed 7:00 PM ET",
+  user_set_owned: "9",
+  moments_completeable: "6",
+  moments_completeable_delta: "3",
+
+  // reactivation family
+  most_advanced_set_name: "Rookie Debut · Cooper Flagg",
+
+  // fast-break family
+  points_to_next_tier: "50",
+  hours_to_next_lock: "6",
+  counterfactual_player_name: "Cooper Flagg",
+  slate_percentile: "83",
+
+  // abandoned-cart family
+  game_date: "May 3",
+  cart_moment_player: "Tyrese Maxey",
+  cart_moment_play_type: "Step-Back Three · Q4",
+  cart_player_name: "Tyrese Maxey",
+  cart_serial_number: "247",
+  cart_edition_size: "3,500",
+  series_label: "76ers/Celtics R1",
+  series_game_number: "7",
+  opponent_team: "Boston Celtics",
 };
 
 // ===================================================================
