@@ -295,7 +295,7 @@ export const CARDS: UpgradeCard[] = [
         body: [
           "**{{event.setName}}** chronicles {{event.set_chronicler_note}}.",
           "Three Moments are inside this pack. They were minted before the pack was assembled, and the order packs were created determines the serials you pulled. Some collectors open the first pack of a set and find a #1 of the tier. Some open the last pack of a set and find a low-print parallel that will not appear in another pack for months. The serial is the document; the document is permanent.",
-          "Every Moment on Top Shot is a play that actually happened — pulled from the live broadcast, minted on its own serial, owned by you. Not a clip. Not a trading-card scan. The play itself, with the serial number that proves who held it first.",
+          "Three serials are now yours. There is no copy of any Moment with the same serial number.",
           "**On the Marketplace this week, from {{event.setName}}:**",
           "{% for sale in event.set_top_3_recent_sales %}",
           "- {{sale.player}} {{sale.play}} cleared **{{sale.amount}}** ({{sale.sold_at | date: \"%b %-d\"}})",
@@ -421,7 +421,7 @@ export const CARDS: UpgradeCard[] = [
           { label: "Where collectors talk", value: "Discord · The Show · Top Shot Live" },
         ],
         body: [
-          "Every Moment on Top Shot is a play that actually happened — pulled from the live broadcast, minted on its own serial, owned by you. Not a clip. Not a trading-card scan. The play itself.",
+          "NBA Top Shot is where basketball history exists as something you can own. Each Moment is a specific highlight from a specific game — pulled from the live broadcast, minted in a limited run, with a serial number that is permanent and assigned only once.",
           "**Your free pack** has three Moments inside. Already minted, already yours. The order packs were created determines what you pulled.",
           "**Round 2 of the 2026 Playoffs is live this week.** {{week.featured_games}}. The Moments minted from this postseason will be priced against by the next year of the market. Walking in this week means you're holding receipts on history before the rest of the market is loud.",
         ],
@@ -442,10 +442,10 @@ export const CARDS: UpgradeCard[] = [
           { label: "Your free pack", value: "3 Moments · serials already minted, already assigned" },
           { label: "Tonight in the Playoffs", value: "{{week.featured_games}} · Round 2 live" },
           { label: "Where collectors talk", value: "Discord · The Show · Top Shot Live" },
-          { label: "What you actually own", value: "The play itself, on its own serial, on-chain" },
+          { label: "What you actually own", value: "A specific highlight, assigned serial, on-chain" },
         ],
         body: [
-          "Every Moment on NBA Top Shot is a play that actually happened — pulled from the live broadcast, minted on its own serial, owned by you. Not a clip. Not a card scan. The play itself, with the serial number that proves who held it first.",
+          "Every Moment on NBA Top Shot is a specific highlight from a specific game — minted in a limited run, assigned a serial number that never changes. Not a clip you stream. Not a card printed by the millions. Your serial number is permanent. There is no copy with the same number.",
           "**Your free pack** has three Moments inside. They were minted before the pack was assembled, and the order packs were created determines what you pulled. Open it to see which three.",
           "**Round 2 of the 2026 Playoffs is live this week.** {{week.featured_games}}. The Moments minted from this postseason will be priced against by the next year of the secondary market. Walking in this week means you are holding receipts on history before the rest of the market is loud about it.",
           "A note for what comes next. The collectors who have been here longest treat this as a long form. They learn the sets. They watch which serials trade and at what comp. They follow Flash Challenges and Fast Break for the daily rhythm. They use Discord and the Show as the room where the conversation lives. None of it is required to enjoy the platform. All of it is available when you are ready.",
@@ -859,10 +859,11 @@ export const CARDS: UpgradeCard[] = [
           "• Serial range {{sale.serial_range}} cleared **{{sale.amount}}** on {{sale.sold_at | date: \"%b %-d\"}}",
           "{% endfor %}",
           "**Listing intact.** The Moment hasn't moved.",
+          "**{{event.weekly_set_buyers}} collectors** bought from {{event.setName}} this week.",
         ],
         cta: "Finish your purchase",
         voice_notes:
-          "Drops the cliché. Keeps every Liquid var. Adds structured callouts and comp-data block — substance instead of metaphor. No 'I,' no personal-letter tone. Pure factual chronicler-of-the-marketplace voice.",
+          "Drops the cliché. Keeps every Liquid var. Adds structured callouts, comp-data block, and social proof count — substance instead of metaphor. No 'I,' no personal-letter tone. Pure factual chronicler-of-the-marketplace voice.",
       },
       almanac: {
         label: "Frame A — Almanac · Abandoned cart with comp-band evidence",
