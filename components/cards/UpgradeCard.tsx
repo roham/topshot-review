@@ -1,4 +1,4 @@
-import type { UpgradeCard as TUpgradeCard, UpgradeState } from "@/lib/cards";
+import type { UpgradeCard as TUpgradeCard, UpgradeState, VoiceMode } from "@/lib/cards";
 
 const STATE_LABEL: Record<UpgradeState, string> = {
   "stopped": "STOPPED",
@@ -12,6 +12,11 @@ const STATE_TONE: Record<UpgradeState, string> = {
   "broken-in-prod": "border-rose-600 bg-rose-600/25 text-rose-200 animate-pulse",
   "missing": "border-amber-500/50 bg-amber-500/15 text-amber-300",
   "running-flat": "border-amber-500/40 bg-amber-500/10 text-amber-200",
+};
+
+const VOICE_LABEL: Record<VoiceMode, string> = {
+  "platform-chronicler": "Platform · chronicler",
+  "magic-observational": "Magic · observational",
 };
 
 // Render markdown-ish bold (**text**) as <strong>; preserve linebreaks elsewhere.
@@ -67,24 +72,13 @@ export function UpgradeCard({ card }: { card: TUpgradeCard }) {
         </div>
         <div className="absolute bottom-5 left-5 right-5">
           <div className="text-[11px] uppercase tracking-[0.18em] text-flame-300 font-semibold">
-            Customer.io upgrade · v1000
+            Customer.io upgrade · v1001
           </div>
           <h2 className="mt-1.5 font-display text-2xl sm:text-3xl font-semibold tracking-tight text-ink-50 leading-[1.1] text-balance">
             {card.stack_item}
           </h2>
         </div>
       </div>
-
-      {/* P0 notice */}
-      {card.p0_notice && (
-        <div className="mx-5 mt-4 rounded-xl border border-rose-500/50 bg-rose-500/10 px-3.5 py-3 flex gap-2.5">
-          <span className="text-rose-400 text-[15px] leading-none shrink-0 mt-[1px]">⚠</span>
-          <p className="text-[13px] text-rose-200 leading-[1.5]">
-            <span className="font-semibold">P0 ships today. </span>
-            {card.p0_notice}
-          </p>
-        </div>
-      )}
 
       {/* Headline */}
       <div className="px-5 pt-5 pb-4 border-b border-white/5">
@@ -198,15 +192,21 @@ export function UpgradeCard({ card }: { card: TUpgradeCard }) {
       )}
 
       {/* After */}
-      <Section title="Proposed v1000 — Magic voice" tone="after">
-        <div className="text-[10.5px] uppercase tracking-wider text-ink-400 font-semibold">
-          {card.after.label}
+      <Section title="Proposed v1001 — upgrade" tone="after">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="text-[10.5px] uppercase tracking-wider text-ink-400 font-semibold">
+            {card.after.label}
+          </div>
+          <span className="text-[10px] uppercase tracking-[0.16em] px-2 py-0.5 rounded-full border border-mint-500/30 bg-mint-500/10 text-mint-300 font-semibold">
+            Voice · {VOICE_LABEL[card.voice]}
+          </span>
         </div>
         <div className="mt-2 rounded-xl border border-mint-500/20 bg-mint-500/[0.04] overflow-hidden">
+          {/* Email-style header */}
           <div className="px-3 py-2 border-b border-mint-500/15 bg-mint-500/[0.03]">
             <div className="flex items-center gap-2">
               <div className="h-7 w-7 rounded-full bg-gradient-to-br from-flame-400 to-flame-600 grid place-items-center text-white text-[10.5px] font-bold flex-shrink-0">
-                M
+                {card.after.from.startsWith("Magic") ? "M" : "TS"}
               </div>
               <div className="min-w-0 flex-1">
                 <div className="text-[12px] text-ink-100 font-semibold truncate">
@@ -218,6 +218,7 @@ export function UpgradeCard({ card }: { card: TUpgradeCard }) {
               </div>
             </div>
           </div>
+          {/* Subject + preheader */}
           <div className="px-3 pt-3">
             <div className="text-[15px] text-ink-50 font-semibold leading-snug text-balance">
               {card.after.subject}
@@ -226,7 +227,30 @@ export function UpgradeCard({ card }: { card: TUpgradeCard }) {
               {card.after.preheader}
             </div>
           </div>
-          <div className="px-3 pt-3 pb-4 space-y-2.5 text-[13.5px] text-ink-100 leading-[1.55]">
+          {/* Hero placeholder strip — image-led signal */}
+          <div className="mx-3 mt-3 rounded-lg border border-white/10 bg-gradient-to-br from-ink-800 to-ink-900 px-3 py-3 text-[10.5px] uppercase tracking-wider text-ink-500 font-semibold text-center">
+            ▢ Hero image · branded · 60%+ visual real estate
+          </div>
+          {/* Structured callouts */}
+          {card.after.callouts && card.after.callouts.length > 0 && (
+            <div className="mx-3 mt-3 rounded-lg border border-flame-500/20 bg-flame-500/[0.04] divide-y divide-flame-500/15 overflow-hidden">
+              {card.after.callouts.map((c, i) => (
+                <div
+                  key={i}
+                  className="grid grid-cols-[minmax(96px,30%)_1fr] text-[12px]"
+                >
+                  <div className="px-3 py-2 bg-flame-500/[0.03] text-flame-300 font-semibold uppercase tracking-wider text-[10px]">
+                    {c.label}
+                  </div>
+                  <div className="px-3 py-2 text-ink-100 font-mono text-[11.5px] break-words">
+                    {c.value}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          {/* Body */}
+          <div className="px-3 pt-3 pb-3 space-y-2.5 text-[13.5px] text-ink-100 leading-[1.55]">
             {card.after.body.map((p, i) => {
               if (/^\{%/.test(p.trim()) || /^\{\{/.test(p.trim())) {
                 return (
@@ -241,6 +265,12 @@ export function UpgradeCard({ card }: { card: TUpgradeCard }) {
                 </p>
               );
             })}
+          </div>
+          {/* CTA */}
+          <div className="mx-3 mb-3 mt-1">
+            <div className="rounded-lg bg-flame-500 px-4 py-2.5 text-center text-[13px] font-semibold text-white">
+              {card.after.cta} →
+            </div>
           </div>
         </div>
         {card.after.voice_notes && (
