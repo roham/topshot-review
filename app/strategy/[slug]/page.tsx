@@ -1,0 +1,95 @@
+import fs from "fs";
+import path from "path";
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import { marked } from "marked";
+import { Logo } from "@/components/Logo";
+
+interface Props {
+  params: Promise<{ slug: string }>;
+}
+
+function stripFrontmatter(raw: string): string {
+  if (!raw.startsWith("---")) return raw;
+  const end = raw.indexOf("---", 3);
+  if (end === -1) return raw;
+  return raw.slice(end + 3).trimStart();
+}
+
+function getTitle(raw: string, slug: string): string {
+  // frontmatter title
+  if (raw.startsWith("---")) {
+    const end = raw.indexOf("---", 3);
+    if (end !== -1) {
+      const fm = raw.slice(3, end);
+      const m = fm.match(/^title:\s*(.+)$/m);
+      if (m) return m[1].trim();
+    }
+  }
+  // first H1 in body
+  const h1 = raw.match(/^# (.+)$/m);
+  if (h1) return h1[1].trim();
+  return slug;
+}
+
+export async function generateStaticParams() {
+  const dir = path.join(process.cwd(), "content", "strategy");
+  const files = fs.readdirSync(dir).filter((f) => f.endsWith(".md"));
+  return files.map((f) => ({ slug: f.replace(/\.md$/, "") }));
+}
+
+export default async function StrategyDoc({ params }: Props) {
+  const { slug } = await params;
+  const filePath = path.join(process.cwd(), "content", "strategy", `${slug}.md`);
+
+  if (!fs.existsSync(filePath)) {
+    notFound();
+  }
+
+  const raw = fs.readFileSync(filePath, "utf-8");
+  const title = getTitle(raw, slug);
+  const body = stripFrontmatter(raw);
+  const html = await marked(body, { gfm: true, breaks: false });
+
+  // Extract date from slug
+  const dateMatch = slug.match(/^(\d{4}-\d{2}-\d{2})/);
+  const date = dateMatch ? dateMatch[1] : "";
+  const lineCount = raw.split("\n").length;
+
+  return (
+    <main className="min-h-[100dvh] bg-ink-950">
+      <header className="px-6 pt-6 pb-4 flex items-center justify-between max-w-4xl mx-auto">
+        <Logo />
+        <Link href="/strategy" className="text-[11px] uppercase tracking-wider text-ink-400 hover:text-ink-100 transition-colors">
+          ← Strategy
+        </Link>
+      </header>
+
+      <div className="max-w-4xl mx-auto px-6 py-4 pb-2">
+        <div className="flex items-center gap-3 text-[11px] text-ink-500">
+          {date && <span className="font-mono">{date}</span>}
+          <span>·</span>
+          <span className="font-mono">{lineCount.toLocaleString()} lines</span>
+          <span>·</span>
+          <span className="font-mono text-ink-600">{slug}</span>
+        </div>
+      </div>
+
+      <div className="max-w-4xl mx-auto px-6 py-6">
+        <article
+          className="prose prose-invert max-w-3xl prose-headings:font-display prose-headings:tracking-tight prose-h1:text-ink-50 prose-h2:text-ink-100 prose-h3:text-ink-200 prose-p:text-ink-300 prose-li:text-ink-300 prose-strong:text-ink-100 prose-code:text-flame-300 prose-code:bg-ink-800 prose-code:rounded prose-code:px-1 prose-pre:bg-ink-800 prose-pre:border prose-pre:border-white/10 prose-a:text-flame-400 prose-a:no-underline hover:prose-a:underline prose-blockquote:border-flame-500/40 prose-blockquote:text-ink-400 prose-hr:border-white/10 prose-table:text-ink-300 prose-thead:border-white/10 prose-tr:border-white/5"
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+      </div>
+
+      <div className="max-w-4xl mx-auto px-6 pb-8 pt-4 border-t border-white/5">
+        <Link
+          href="/strategy"
+          className="inline-flex items-center gap-2 text-[12px] text-ink-400 hover:text-ink-100 transition-colors"
+        >
+          ← Back to all strategy docs
+        </Link>
+      </div>
+    </main>
+  );
+}
