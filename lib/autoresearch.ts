@@ -64,6 +64,7 @@ export type LeaderboardEntry = {
 const TRIGGER_HERO: Record<string, string> = {
   "welcome": "/cards/welcome.png",
   "pack-received": "/cards/pack-pull.png",
+  "pack-pull-recap": "/cards/pack-pull.png",
   "drop-announcement": "/cards/drop-series.png",
   "fast-break": "/cards/infographics/fastbreak-scorecard.png",
   "abandoned-cart": "/cards/daily-reminder.png",
@@ -73,6 +74,7 @@ const TRIGGER_HERO: Record<string, string> = {
 const TRIGGER_LABEL: Record<string, string> = {
   "welcome": "Welcome",
   "pack-received": "Pack Received",
+  "pack-pull-recap": "Pack Pull Recap",
   "drop-announcement": "Drop Announcement",
   "fast-break": "Fast Break",
   "abandoned-cart": "Abandoned Cart",
@@ -99,6 +101,7 @@ const TIER_LABEL: Record<string, string> = {
 const TRIGGER_TO_MOCK_CARD_ID: Record<string, string> = {
   "welcome": "welcome-onboarding",
   "pack-received": "pack-received-voice",
+  "pack-pull-recap": "pack-received-voice",
   "drop-announcement": "drop-announcement-programmatic",
   "fast-break": "fast-break-result-fix",
   "abandoned-cart": "abandoned-cart",
@@ -190,13 +193,36 @@ function htmlToBodyArray(html: string | undefined): string[] {
   return out;
 }
 
+const HTML_ENTITIES: Record<string, string> = {
+  "&mdash;": "—",
+  "&ndash;": "–",
+  "&rarr;": "→",
+  "&larr;": "←",
+  "&uarr;": "↑",
+  "&darr;": "↓",
+  "&hellip;": "…",
+  "&amp;": "&",
+  "&lt;": "<",
+  "&gt;": ">",
+  "&quot;": '"',
+  "&apos;": "'",
+  "&#39;": "'",
+  "&nbsp;": " ",
+};
+
+function decodeEntities(s: string): string {
+  return s.replace(/&[a-zA-Z#0-9]+;/g, (e) => HTML_ENTITIES[e] ?? e);
+}
+
 function stripTags(s: string): string {
-  return s
-    .replace(/<a\s+[^>]*>([\s\S]*?)<\/a>/gi, "$1")
-    .replace(/<strong[^>]*>([\s\S]*?)<\/strong>/gi, "$1")
-    .replace(/<em[^>]*>([\s\S]*?)<\/em>/gi, "$1")
-    .replace(/<br\s*\/?>/gi, " ")
-    .replace(/<[^>]+>/g, "");
+  return decodeEntities(
+    s
+      .replace(/<a\s+[^>]*>([\s\S]*?)<\/a>/gi, "$1")
+      .replace(/<strong[^>]*>([\s\S]*?)<\/strong>/gi, "$1")
+      .replace(/<em[^>]*>([\s\S]*?)<\/em>/gi, "$1")
+      .replace(/<br\s*\/?>/gi, " ")
+      .replace(/<[^>]+>/g, "")
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -404,6 +430,38 @@ export function loadAutoresearchCards(opts: LoadOptions = {}): {
   let filtered = entries.filter(
     (e) => (e.total_score ?? 0) >= minScore && isDesignReady(e)
   );
+
+  // Reject drafts where the rendered output would have too many unresolved
+  // Liquid placeholders. After resolveOrPlaceholder runs, [bracket] tokens
+  // signal vars our mock data doesn't cover. >2 brackets in a draft body =
+  // not review-ready (looks broken to colleagues, not designed).
+  const placeholderDensityOK = (e: LeaderboardEntry): boolean => {
+    const subject = e.draft?.subject ?? "";
+    const html = e.draft?.body_html ?? "";
+    const tokens: string[] = [
+      ...((subject.match(/\{\{[^}]+\}\}/g) ?? []) as string[]),
+      ...((html.match(/\{\{[^}]+\}\}/g) ?? []) as string[]),
+    ];
+    const knownTokens = tokens.filter((t) => {
+      const path = t.replace(/[{}|\s]/g, "").split("|")[0];
+      const segments = path.split(".");
+      let cur: unknown = AUTORESEARCH_DEFAULTS as Record<string, unknown>;
+      for (const seg of segments) {
+        if (cur && typeof cur === "object" && seg in (cur as Record<string, unknown>)) {
+          cur = (cur as Record<string, unknown>)[seg];
+        } else {
+          return false;
+        }
+      }
+      return cur != null && cur !== "";
+    });
+    const unknown = tokens.length - knownTokens.length;
+    // Allow at most 2 unknowns and at most 30% unknown ratio.
+    if (unknown <= 2) return true;
+    if (tokens.length === 0) return true;
+    return unknown / tokens.length <= 0.3;
+  };
+  filtered = filtered.filter(placeholderDensityOK);
 
   if (bestPerSlice) {
     const bestBy: Record<string, LeaderboardEntry> = {};

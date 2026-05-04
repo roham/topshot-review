@@ -704,6 +704,7 @@ export function UpgradeCard({
   const AUTO_TO_HANDBUILT: Record<string, string> = {
     "auto-welcome-": "welcome-onboarding",
     "auto-pack-received-": "pack-received-voice",
+    "auto-pack-pull-recap-": "pack-received-voice",
     "auto-drop-announcement-": "drop-announcement-programmatic",
     "auto-fast-break-": "fast-break-result-fix",
     "auto-abandoned-cart-": "abandoned-cart",

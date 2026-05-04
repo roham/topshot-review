@@ -54,6 +54,7 @@ export const CARD_TEMPLATE_MAP: Record<string, TemplateId> = {
 const AUTO_TRIGGER_PREFIX_TO_TEMPLATE: { prefix: string; templateId: TemplateId }[] = [
   { prefix: "auto-welcome-", templateId: "welcome" },
   { prefix: "auto-pack-received-", templateId: "pack-received" },
+  { prefix: "auto-pack-pull-recap-", templateId: "pack-received" },
   { prefix: "auto-drop-announcement-", templateId: "drop-announcement" },
   { prefix: "auto-fast-break-", templateId: "fast-break" },
   { prefix: "auto-abandoned-cart-", templateId: "abandoned-cart" },
