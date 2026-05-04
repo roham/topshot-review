@@ -33,53 +33,130 @@ const ASSETS = {
 };
 
 // Default mock collector — used across most cards for cohesion
+// DATA NOTE: notable_holdings_moving is grounded in real BQ marketplace data.
+// Prices, serials, and sale dates are pulled from dapperlabs-data.production_mart_nba_product.mart_nba_product_marketplace.
+// "Bought price" reflects the earliest documented secondary-market floor for that edition
+// (i.e., the entry price available to a collector acquiring at or near drop).
+// This collector represents the Segment A "Origin Story Holder" — bought S1 in 2020, has been dormant ~1,700d.
 const SARAH: MockContext = {
   userName: "Sarah",
-  first_session_at: "2021-03-15T10:00:00Z",
-  last_session_days_ago: 73,
-  lifetime_moments_owned: 47,
-  lifetime_value: "$8,420",
-  team_count_at_moment: 4,
+  first_session_at: "2020-10-28T10:00:00Z",  // S1 era
+  last_session_days_ago: 1698,               // ~4.6 years dormant — pre-2022 era buyer
+  lifetime_moments_owned: 94,
+  lifetime_value: "$188,000",
+  team_count_at_moment: 6,
   notable_holdings_moving: [
     {
-      player: "LeBron James",
-      set: "Hardwood Classics 2024",
-      serial: "842",
-      bought_at: "2024-02-12T14:00:00Z",
-      bought_price: "$48",
-      floor_today: "$112",
-      recent_comp: "$196",
-      recent_comp_at: "2026-04-30T18:00:00Z",
-      pct_change: "+18.2%",
+      // Jokic S1 Holo MMXX Legendary — the anchor position
+      // BQ: serial #14 last sold 2026-02-12 at $2,250; serial #5 sold 2026-05-01 at $2,555; serial #28 sold 2026-03-30 at $3,399
+      // Entry price: S1 Holo MMXX floor in 2021 was ~$550-$899 for non-jersey serials
+      player: "Nikola Jokić",
+      set: "Series 1 — Holo MMXX",
+      serial: "14",
+      bought_at: "2021-03-10T14:00:00Z",
+      bought_price: "$650",
+      floor_today: "$2,250",
+      recent_comp: "$3,399",
+      recent_comp_at: "2026-03-30T21:11:07Z",
+      pct_change: "+246%",
       image_url:
         "https://userimg-assets.customeriomail.com/images/client-env-161112/1747166167882_03-PACKS-ARE-YOUR-DOORWAY-TO-GREATNESSNEW2_01JV5KFXMNRPTA0J24ESESYX7N.jpg",
     },
     {
-      player: "Cooper Flagg",
-      set: "Rookie Debut",
-      serial: "1247",
-      bought_at: "2025-11-04T19:30:00Z",
-      bought_price: "$24",
-      floor_today: "$340",
-      recent_comp: "$485",
-      recent_comp_at: "2026-05-02T22:00:00Z",
-      pct_change: "+24.7%",
+      // LeBron S1 Cosmic Legendary — the highest-value position
+      // BQ: serial #41 sold 2026-03-09 at $13,000; serial #44 sold 2026-01-04 at $12,750
+      // Entry price: 2021 era median was ~$3,750-$5,000 for mid-range serials
+      player: "LeBron James",
+      set: "Series 1 — Cosmic",
+      serial: "41",
+      bought_at: "2021-04-22T18:00:00Z",
+      bought_price: "$3,750",
+      floor_today: "$12,750",
+      recent_comp: "$13,000",
+      recent_comp_at: "2026-03-09T05:50:07Z",
+      pct_change: "+240%",
       image_url: ASSETS.setHero,
     },
     {
-      player: "Donovan Mitchell",
-      set: "Pull-Up Three",
-      serial: "2418",
-      bought_at: "2024-01-20T20:30:00Z",
-      bought_price: "$112",
-      floor_today: "$245",
-      recent_comp: "$312",
-      recent_comp_at: "2026-05-03T16:00:00Z",
-      pct_change: "+12.1%",
+      // Victor Wembanyama Constellations Series 7 Rare — the "recent add" position
+      // BQ: serial #138 sold 2026-05-01 at $43; serial #11 (premium jersey adjacent) sold at $77
+      // Drop floor Feb 19, 2026: $27 for non-jersey Wemby serials
+      player: "Victor Wembanyama",
+      set: "Series 7 — Constellations",
+      serial: "138",
+      bought_at: "2026-02-19T10:00:00Z",
+      bought_price: "$27",
+      floor_today: "$43",
+      recent_comp: "$77",
+      recent_comp_at: "2026-05-01T23:44:45Z",
+      pct_change: "+59%",
       image_url: ASSETS.collectorFirstPack,
     },
   ],
   holdings_sparkline_url: ASSETS.sparkline,
+};
+
+// "DO NOT SEND" comparison profile — collector whose portfolio is deeply underwater.
+// Represents the 2022 ATH-era buyer (Segment: S3/S4 era, ~480 collectors in cohort).
+// BQ data: Giannis 2021 Finals Legendary median sale price in 2021 was $5,900; current floor $650 (single 2026 sale).
+// LeBron S2 Holo Icon: 2021 median $19,999; current floor $777.
+// DO NOT send "wallet is up" copy to this cohort — factually false, destroys trust.
+// Use a different reactivation angle (documentary value, not financial appreciation).
+const KAI_FLAT: MockContext = {
+  userName: "Kai",
+  first_session_at: "2021-12-08T10:00:00Z",   // Joined at ATH, bought Legendaries at peak
+  last_session_days_ago: 1402,                  // Dormant since mid-2022
+  lifetime_moments_owned: 178,
+  lifetime_value: "$195,000",
+  team_count_at_moment: 5,
+  // NEGATIVE MATH — do not use for "wallet is up" framing
+  notable_holdings_moving: [
+    {
+      // Giannis S2 2021 NBA Finals Legendary — bought at peak, DOWN 89%
+      // BQ: 2021 median sale $5,900; 2026 latest sale $650
+      player: "Giannis Antetokounmpo",
+      set: "Series 2 — 2021 NBA Finals",
+      serial: "82",
+      bought_at: "2022-01-15T14:00:00Z",
+      bought_price: "$5,900",
+      floor_today: "$650",
+      recent_comp: "$650",
+      recent_comp_at: "2026-03-27T00:06:36Z",
+      pct_change: "-89%",
+      image_url: ASSETS.setHero,
+    },
+    {
+      // LeBron S2 Holo Icon Legendary — bought at ATH, DOWN 96% from peak
+      // BQ: 2021 median $19,999; 2026 floor $777 (one sale)
+      player: "LeBron James",
+      set: "Series 2 — Deck the Hoops",
+      serial: "47",
+      bought_at: "2022-01-20T18:00:00Z",
+      bought_price: "$12,500",
+      floor_today: "$777",
+      recent_comp: "$2,300",
+      recent_comp_at: "2026-04-12T05:30:41Z",
+      pct_change: "-94%",
+      image_url: ASSETS.momentPlaceholder,
+    },
+    {
+      // Luka S2 Holo Icon Legendary — bought at ATH, DOWN 92%
+      // BQ: 2021 median $7,500; 2026 single sale $625
+      player: "Luka Dončić",
+      set: "Series 2 — Holo Icon",
+      serial: "63",
+      bought_at: "2022-01-25T20:00:00Z",
+      bought_price: "$7,500",
+      floor_today: "$625",
+      recent_comp: "$625",
+      recent_comp_at: "2026-01-27T06:02:45Z",
+      pct_change: "-92%",
+      image_url: ASSETS.momentPlaceholder,
+    },
+  ],
+  holdings_sparkline_url: ASSETS.sparkline,
+  _do_not_send_note:
+    "DO NOT use KAI_FLAT for 'wallet is up' reactivation copy. This collector is deeply underwater. Estimated cohort: ~480 collectors who last transacted in 2022-2023 at ATH prices. Different message needed (documentary value frame, not appreciation frame).",
 };
 
 const MARCUS_WHALE: MockContext = {
@@ -113,11 +190,18 @@ const MARKET: MockContext = {
 // ===================================================================
 
 export const MOCK_CONTEXTS: Record<string, MockContext> = {
+  // REACTIVATION DRIP — targets positive-math dormant L+XL collectors.
+  // SARAH = Origin Story Holder (Segment A). Pre-2022 buyer, S1 Legendaries up 240-246%.
+  // Use SARAH (positive math). Do NOT use KAI_FLAT (deeply underwater, see note on that const).
+  // Estimated positive-math send cohort from BQ: ~350-550 of the 1,164 dormant L+XL collectors.
+  // Source: dapperlabs-data.production_mart_nba_product.mart_nba_product_marketplace (queried 2026-05-04).
   "reactivation-drip": {
     customer: SARAH,
     week: WEEK,
     market: MARKET,
   },
+  // Comparison — would NOT send this variant (negative math, 2022 ATH buyers):
+  // "reactivation-drip-do-not-send": { customer: KAI_FLAT, week: WEEK, market: MARKET },
 
   "pack-received-voice": {
     customer: SARAH,
