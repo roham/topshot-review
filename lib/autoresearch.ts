@@ -277,6 +277,12 @@ export function entryToCard(entry: LeaderboardEntry, position: number): Card {
   };
   const resolvedSubject = resolveOrPlaceholder(draft.subject);
   const resolvedPreheader = resolveOrPlaceholder(draft.preheader);
+  const resolvedCallouts = callouts.map((c) => ({
+    label: resolveOrPlaceholder(c.label),
+    value: resolveOrPlaceholder(c.value),
+  }));
+  const resolvedBody = bodyArr.map(resolveOrPlaceholder);
+  const resolvedCta = resolveOrPlaceholder(draft.cta_label) || draft.cta_label || "View on NBA Top Shot";
 
   const after: AfterBlock = {
     label: `${triggerLabel} · ${draft.voice_mode ?? "draft"}`,
@@ -290,9 +296,9 @@ export function entryToCard(entry: LeaderboardEntry, position: number): Card {
         ? `Spec: ${draft.hero_image_asset.slice(0, 160)}`
         : undefined,
     },
-    callouts: callouts.length ? callouts : undefined,
-    body: bodyArr.length ? bodyArr : ["(empty body)"],
-    cta: draft.cta_label ?? "View on NBA Top Shot",
+    callouts: resolvedCallouts.length ? resolvedCallouts : undefined,
+    body: resolvedBody.length ? resolvedBody : ["(empty body)"],
+    cta: resolvedCta,
     voice_notes: draft.voice_mode ? `Voice mode: ${draft.voice_mode}` : undefined,
   };
 
