@@ -110,6 +110,43 @@ const TRIGGER_TO_MOCK_CARD_ID: Record<string, string> = {
 // the existing UpgradeCard expects (one entry per paragraph or list item).
 // ---------------------------------------------------------------------------
 
+/**
+ * Parse the first `<ul>` block in body_html into callout chips for the
+ * existing per-trigger templates' callout slots. Each `<li>` becomes one chip.
+ *
+ * If a `<li>` leads with `<strong>X</strong>` followed by descriptive text,
+ * X is treated as the value (the chip's bold metric) and the rest as the label.
+ * Otherwise the entire item becomes the label and value is left empty (the
+ * template renders these as descriptive chips without a numeric).
+ */
+export function htmlToCallouts(html: string | undefined): { label: string; value: string }[] {
+  if (!html) return [];
+  const ulMatch = html.match(/<ul[^>]*>([\s\S]*?)<\/ul>/i);
+  if (!ulMatch) return [];
+  const inner = ulMatch[1];
+  const items = Array.from(inner.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/gi)).map(
+    (m) => (m as RegExpMatchArray)[1]
+  );
+  const callouts: { label: string; value: string }[] = [];
+  for (const raw of items.slice(0, 5)) {
+    const strongMatch = raw.match(/<strong[^>]*>([\s\S]*?)<\/strong>/i);
+    if (strongMatch) {
+      const value = stripTags(strongMatch[1]).trim();
+      const labelRaw = raw
+        .replace(/<strong[^>]*>[\s\S]*?<\/strong>/i, "")
+        .trim();
+      const label = stripTags(labelRaw).replace(/^[—\-,:\s]+/, "").trim();
+      if (value) {
+        callouts.push({ label: label || "—", value });
+        continue;
+      }
+    }
+    const text = stripTags(raw).replace(/\s+/g, " ").trim();
+    if (text) callouts.push({ label: text, value: "" });
+  }
+  return callouts;
+}
+
 function htmlToBodyArray(html: string | undefined): string[] {
   if (!html) return [];
   // Strip outer tags + extract inner text per paragraph / list-item.
@@ -206,7 +243,12 @@ export function entryToCard(entry: LeaderboardEntry, position: number): Card {
   const hero = TRIGGER_HERO[trigger] ?? "/cards/infographics/moment-hero-placeholder.png";
 
   const draft = entry.draft ?? {};
-  const bodyArr = htmlToBodyArray(draft.body_html);
+  // Strip the <ul> block from body_html for paragraph extraction — it'll
+  // render separately as designed callout chips. This prevents the bullets
+  // from double-rendering as both chips AND text-stripped body lines.
+  const bodyHtmlWithoutList = (draft.body_html ?? "").replace(/<ul[^>]*>[\s\S]*?<\/ul>/gi, "");
+  const bodyArr = htmlToBodyArray(bodyHtmlWithoutList);
+  const callouts = htmlToCallouts(draft.body_html);
   // Resolve headline-display Liquid (subject, preheader) with the
   // autoresearch defaults so the card's static text fields don't show
   // raw `{{var}}`. The detailed in-email body still goes through full
@@ -248,6 +290,7 @@ export function entryToCard(entry: LeaderboardEntry, position: number): Card {
         ? `Spec: ${draft.hero_image_asset.slice(0, 160)}`
         : undefined,
     },
+    callouts: callouts.length ? callouts : undefined,
     body: bodyArr.length ? bodyArr : ["(empty body)"],
     cta: draft.cta_label ?? "View on NBA Top Shot",
     voice_notes: draft.voice_mode ? `Voice mode: ${draft.voice_mode}` : undefined,
