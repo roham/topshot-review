@@ -22,7 +22,7 @@ export default function Home() {
     <main className="min-h-[100dvh] flex flex-col">
       <header className="px-6 pt-6 pb-2 flex items-center justify-between">
         <Logo />
-        <span className="text-[11px] uppercase tracking-wider text-ink-500">v1001</span>
+        <span className="text-[11px] uppercase tracking-wider text-ink-500">v1002</span>
       </header>
 
       <div className="flex-1 grid place-items-center px-6 py-10">
@@ -34,7 +34,7 @@ export default function Home() {
             Seven programmatic email upgrades.
           </h1>
           <p className="mt-4 text-[15px] sm:text-base text-ink-300 text-pretty leading-relaxed">
-            Each card is one Customer.io flow Magic wants to upgrade — grounded in live workspace data, BQ-baselined audience numbers, and a real before-vs-after.{" "}
+            Each card is one Customer.io flow Magic wants to upgrade — grounded in live workspace data, BQ-baselined audience numbers, and a real before-vs-after with actual images.{" "}
             For each one: <span className="text-mint-400 font-semibold">ship it</span>,{" "}
             <span className="text-rose-400 font-semibold">nope</span>, or{" "}
             <span className="text-amber-400 font-semibold">needs work</span>. About 10 minutes.

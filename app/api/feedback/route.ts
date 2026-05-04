@@ -25,11 +25,11 @@ async function gh(path: string, init?: RequestInit) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { piece_id, vote, note, reasons, voter } = body ?? {};
+    const { piece_id, variant, vote, note, reasons, voter } = body ?? {};
     if (!piece_id || !vote || !voter) return NextResponse.json({ error: "missing fields" }, { status: 400 });
 
     const ts = new Date().toISOString();
-    const record = { piece_id, vote, note, reasons, voter, ts };
+    const record = { piece_id, variant: variant ?? "v1001", vote, note, reasons, voter, ts };
 
     if (!GH_TOKEN || !GH_REPO) {
       // Fallback: log to server console; client persists locally
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     const res = await gh(`/contents/${filename}`, {
       method: "PUT",
       body: JSON.stringify({
-        message: `feedback: ${voter} · ${vote} · ${piece_id}`,
+        message: `feedback: ${voter} · ${vote} · ${piece_id} · ${variant ?? "v1001"}`,
         content,
         branch: GH_BRANCH,
       }),

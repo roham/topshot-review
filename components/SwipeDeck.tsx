@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { Card } from "@/lib/cards";
+import type { Card, AfterVariantId } from "@/lib/cards";
 import { REASONS } from "@/lib/cards";
 import { UpgradeCard } from "./cards/UpgradeCard";
 
@@ -9,6 +9,7 @@ type Vote = "ship" | "no" | "needs-work";
 
 export function SwipeDeck({ cards, voter }: { cards: Card[]; voter: string }) {
   const [index, setIndex] = useState(0);
+  const [activeVariant, setActiveVariant] = useState<AfterVariantId>("v1001");
   const [showReasons, setShowReasons] = useState<{ vote: Vote; cardId: string } | null>(null);
   const [shipped, setShipped] = useState(0);
   const [killed, setKilled] = useState(0);
@@ -16,10 +17,11 @@ export function SwipeDeck({ cards, voter }: { cards: Card[]; voter: string }) {
 
   const card = cards[index];
 
-  // Scroll back to top on each new card.
+  // Scroll back to top + reset variant on each new card.
   useEffect(() => {
     const el = document.getElementById("deck-scroll");
     if (el) el.scrollTop = 0;
+    setActiveVariant("v1001");
   }, [index]);
 
   const submit = async (vote: Vote, note?: string, reasons?: string[]) => {
@@ -27,7 +29,7 @@ export function SwipeDeck({ cards, voter }: { cards: Card[]; voter: string }) {
     fetch("/api/feedback", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ piece_id: card.id, vote, note, reasons, voter }),
+      body: JSON.stringify({ piece_id: card.id, variant: activeVariant, vote, note, reasons, voter }),
     }).catch(() => {});
     if (vote === "ship") setShipped((n) => n + 1);
     else if (vote === "no") setKilled((n) => n + 1);
@@ -60,7 +62,7 @@ export function SwipeDeck({ cards, voter }: { cards: Card[]; voter: string }) {
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.22 }}
           >
-            <UpgradeCard card={card} />
+            <UpgradeCard card={card} activeVariant={activeVariant} onVariantChange={setActiveVariant} />
           </motion.div>
         </AnimatePresence>
       </div>
@@ -90,7 +92,7 @@ export function SwipeDeck({ cards, voter }: { cards: Card[]; voter: string }) {
           </button>
         </div>
         <div className="mt-2 text-center text-[10.5px] text-ink-400 uppercase tracking-wider">
-          Reviewing {card.position} of {cards.length} · Magic reads every reason
+          Voting on <span className="text-ink-200 font-semibold">{activeVariant}</span> · {card.position} of {cards.length}
         </div>
       </div>
 

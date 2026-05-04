@@ -1,9 +1,9 @@
-// v1001 — Customer.io upgrade cards.
-// Voice mix: 6 platform-chronicler cards, 1 Magic-observational (whale-tier
-// concierge — the 10-20% personal slot). Each After block is image-led,
-// structured-data-driven, with a brief celebrate-the-Moment / chronicle-the-
-// legend / report-the-marketplace paragraph. No personal letters from Magic
-// or Matt — those don't convert and the team correctly rejected them.
+// v1002 — Customer.io upgrade cards with 4-variant After blocks.
+// Voice mix: v1001 (current platform-chronicler) + 3 alternate frames:
+//   - almanac:   Frame A — Stratechery-style chronicler-statesman
+//   - cinematic: Frame B — Topps-style sensationalized legend
+//   - brief:     Frame C — Bloomberg-style market reporter
+// Voting captures (card × variant) so the team can see which frame wins per stack item.
 
 export type CardKind = "upgrade";
 
@@ -14,6 +14,20 @@ export type UpgradeState =
   | "running-flat";
 
 export type VoiceMode = "platform-chronicler" | "magic-observational";
+
+export type AfterVariantId = "v1001" | "almanac" | "cinematic" | "brief";
+
+export type AfterBlock = {
+  label: string;
+  from: string;
+  subject: string;
+  preheader: string;
+  emailHero?: { src: string; alt: string; liquidCaption?: string };
+  callouts?: { label: string; value: string }[];
+  body: string[];
+  cta: string;
+  voice_notes?: string;
+};
 
 export type UpgradeCard = {
   id: string;
@@ -37,14 +51,10 @@ export type UpgradeCard = {
     critique: string;
   };
   after: {
-    label: string;
-    from: string;
-    subject: string;
-    preheader: string;
-    callouts?: { label: string; value: string }[];
-    body: string[];
-    cta: string;
-    voice_notes?: string;
+    v1001: AfterBlock;
+    almanac: AfterBlock;
+    cinematic: AfterBlock;
+    brief: AfterBlock;
   };
   reviewer_ask: string;
   engineering_hooks?: string[];
@@ -85,26 +95,112 @@ export const CARDS: UpgradeCard[] = [
       ],
     },
     after: {
-      label: "Proposed v1001 — Reactivation Email 1 (60-day-dormant L2 cohort, with-purchases)",
-      from: "NBA Top Shot <hello@nbatopshot.com>",
-      subject: "Three Moments in your collection are moving this week.",
-      preheader: "Round 2 of the 2026 Playoffs is live. Here's where your wallet sits.",
-      callouts: [
-        { label: "Your collection", value: "{{customer.lifetime_moments_owned}} Moments · since {{customer.first_session_at | date: \"%b %Y\"}}" },
-        { label: "Last session", value: "{{customer.last_session_days_ago}} days ago" },
-        { label: "Round 2 status", value: "{{week.featured_games}} · live this week" },
-      ],
-      body: [
-        "Round 2 of the 2026 NBA Playoffs is live. The Moments minted from these games will be priced against by the next year of the secondary market.",
-        "**Three Moments in your wallet are moving:**",
-        "{% for moment in customer.notable_holdings_moving %}",
-        "• **{{moment.player}} — {{moment.set}}, serial #{{moment.serial}}.** Bought {{moment.bought_at | date: \"%b %Y\"}} for {{moment.bought_price}}. Floor today: {{moment.floor_today}}. Comparable serial last cleared at **{{moment.recent_comp}}**.",
-        "{% endfor %}",
-        "Your wallet has been positioned for this since {{customer.first_session_at | date: \"%Y\"}}. The market is starting to catch up.",
-      ],
-      cta: "View your collection",
-      voice_notes:
-        "Platform-chronicler. Opens with basketball context (Round 2 chronicling), structured callouts on user state, structured Moment-by-Moment data with floor/comp. No 'I.' No personal letter framing. Same factual rhythm as a Topps drop announcement, applied to a personalized re-engagement.",
+      v1001: {
+        label: "Proposed v1001 — Reactivation Email 1 (60-day-dormant L2 cohort, with-purchases)",
+        from: "NBA Top Shot <hello@nbatopshot.com>",
+        emailHero: {
+          src: "https://userimg-assets.customeriomail.com/images/client-env-161112/1747166167882_03-PACKS-ARE-YOUR-DOORWAY-TO-GREATNESSNEW2_01JV5KFXMNRPTA0J24ESESYX7N.jpg",
+          alt: "NBA Top Shot — Packs are your doorway to greatness",
+        },
+        subject: "Three Moments in your collection are moving this week.",
+        preheader: "Round 2 of the 2026 Playoffs is live. Here's where your wallet sits.",
+        callouts: [
+          { label: "Your collection", value: "{{customer.lifetime_moments_owned}} Moments · since {{customer.first_session_at | date: \"%b %Y\"}}" },
+          { label: "Last session", value: "{{customer.last_session_days_ago}} days ago" },
+          { label: "Round 2 status", value: "{{week.featured_games}} · live this week" },
+        ],
+        body: [
+          "Round 2 of the 2026 NBA Playoffs is live. The Moments minted from these games will be priced against by the next year of the secondary market.",
+          "**Three Moments in your wallet are moving:**",
+          "{% for moment in customer.notable_holdings_moving %}",
+          "• **{{moment.player}} — {{moment.set}}, serial #{{moment.serial}}.** Bought {{moment.bought_at | date: \"%b %Y\"}} for {{moment.bought_price}}. Floor today: {{moment.floor_today}}. Comparable serial last cleared at **{{moment.recent_comp}}**.",
+          "{% endfor %}",
+          "Your wallet has been positioned for this since {{customer.first_session_at | date: \"%Y\"}}. The market is starting to catch up.",
+        ],
+        cta: "View your collection",
+        voice_notes:
+          "Platform-chronicler. Opens with basketball context (Round 2 chronicling), structured callouts on user state, structured Moment-by-Moment data with floor/comp. No 'I.' No personal letter framing. Same factual rhythm as a Topps drop announcement, applied to a personalized re-engagement.",
+      },
+      almanac: {
+        label: "Frame A — Almanac · Reactivation Email 1 (60d-dormant L2, with-purchases)",
+        from: "NBA Top Shot <hello@nbatopshot.com>",
+        emailHero: {
+          src: "https://userimg-assets.customeriomail.com/images/client-env-161112/1747166167882_03-PACKS-ARE-YOUR-DOORWAY-TO-GREATNESSNEW2_01JV5KFXMNRPTA0J24ESESYX7N.jpg",
+          alt: "NBA Top Shot — Round 2 of the 2026 Playoffs",
+          liquidCaption: "Round 2 of the 2026 NBA Playoffs · live this week",
+        },
+        subject: "Round 2 is the loudest window we've had in two years.",
+        preheader: "Three Moments in your wallet are moving. Here is where each one sits today.",
+        callouts: [
+          { label: "Your collection", value: "{{customer.lifetime_moments_owned}} Moments · holding since {{customer.first_session_at | date: \"%b %Y\"}}" },
+          { label: "Last session", value: "{{customer.last_session_days_ago}} days ago" },
+          { label: "Round 2 status", value: "{{week.featured_games}}" },
+          { label: "Marketplace temperature", value: "Embiid up 3.2× the day his R2 was confirmed; Cade comeback arc cleared $0.28 the morning of the G7" },
+        ],
+        body: [
+          "Round 2 of the 2026 Playoffs is the loudest market window NBA Top Shot has had since the 2024 run. Fourteen Game 7s in fifteen days. Cooper Flagg's first postseason. Banchero's elimination on a one-buyer Moment that cleared $0.28 the morning of his exit. The collectors who held through 2024–2025 are watching the floor catch up to where they bought it.",
+          "You opened your account in {{customer.first_session_at | date: \"%Y\"}}. Your wallet has been positioned for this since.",
+          "**Three Moments in your collection are moving:**",
+          "{% for moment in customer.notable_holdings_moving %}",
+          "- **{{moment.player}} — {{moment.set}}, serial #{{moment.serial}}.** Bought {{moment.bought_at | date: \"%b %Y\"}} at {{moment.bought_price}}. Floor today: {{moment.floor_today}}. The most recent comparable serial cleared at **{{moment.recent_comp}}** on {{moment.recent_comp_at | date: \"%b %-d\"}}.",
+          "{% endfor %}",
+          "The pattern across these three is the same pattern across the cohort. The market is starting to ratify what long-time holders already know: a Moment from a confirmed playoff run is worth more than a Moment from a regular-season night. Narrative density is the price driver. Embiid's appendectomy-comeback path produced 54 transactions in 24 hours; Brunson's expected 2-seed advance produced zero. The market reads what happened.",
+          "Round 2 closes inside two weeks. The next year of secondary pricing will be set against the Moments minted from these games.",
+        ],
+        cta: "View your collection",
+        voice_notes:
+          "Frame A opens the email as a statesman writing to a fellow long-time holder — \"the loudest window we've had in two years\" stakes the time horizon. Anchors directly in the long-time-collector identity (\"holding since {{first_session_at}}\"). Embiid 3.2× and Brunson zero are quoted as evidence of the narrative-density mechanic, not as hype. v1001's reactivation is shorter, more transactional. v1002 takes 60 more words to build the cohort-wide thesis the collector is part of.",
+      },
+      cinematic: {
+        label: "Frame B — Cinematic · Reactivation Drip",
+        from: "NBA Top Shot <drops@nbatopshot.com>",
+        emailHero: {
+          src: "https://userimg-assets.customeriomail.com/images/client-env-161112/1733254430310_04-MORE-THAN-MOMENTS_01_01JE707FKDZM5GN3VEF7G26DYG.jpg",
+          alt: "NBA Top Shot — More Than Moments",
+          liquidCaption: "Dynamic option: {{customer.notable_holdings_moving.[0].image_url}} for personalized hero",
+        },
+        subject: "You were here first.",
+        preheader: "The Cooper Flagg era opens. Your serials predate it.",
+        callouts: [
+          { label: "Your first session", value: "{{customer.first_session_at | date: \"%B %Y\"}}" },
+          { label: "Round 2 of 2026", value: "Live this week" },
+          { label: "Cooper Flagg Era", value: "Begins Drop 1 · May 20" },
+        ],
+        body: [
+          "The market is loud again. **Round 2 is live.** Cooper Flagg drops in two weeks.",
+          "Three Moments in your wallet are **moving right now**: {% for moment in customer.notable_holdings_moving %}**{{moment.player}} #{{moment.serial}}** ({{moment.floor_today}}){% unless forloop.last %}, {% endunless %}{% endfor %}.",
+          "You bought receipts on history before the rest knew. **The rest is showing up.**",
+        ],
+        cta: "SEE WHAT'S MOVING",
+        voice_notes:
+          "Mythic-cinematic reactivation. v1001 was a structured chronicler (\"Three Moments in your collection are moving this week\"). v1002 makes the dormant collector the *legend who got there first* — Cooper Flagg as the cultural arrival moment they were positioned for. Sparse, declarative. Sentiment theme 1 (Cooper Flagg scarcity narrative) drives the emotional pull; the dormant whale's history is the cinematic spine.",
+      },
+      brief: {
+        label: "Frame C — Brief · Reactivation",
+        from: "NBA Top Shot Marketplace <market@nbatopshot.com>",
+        emailHero: {
+          src: "https://userimg-assets.customeriomail.com/images/client-env-161112/sparkline_holdings_7d.png",
+          alt: "7-day sparkline of customer's top 3 moving Moments",
+          liquidCaption: "Dynamic: {{customer.holdings_sparkline_url}} — auto-rendered per wallet",
+        },
+        subject: "Round 2 lifted 3 of your Moments above last-month floor.",
+        preheader: "{{customer.notable_holdings_moving | size}} positions moved >10% in 7d. Comps inside.",
+        callouts: [
+          { label: "Last session", value: "{{customer.last_session_days_ago}}d ago" },
+          { label: "Wallet size", value: "{{customer.lifetime_moments_owned}} Moments · entered {{customer.first_session_at | date: \"%b %Y\"}}" },
+          { label: "Top mover (7d)", value: "{{customer.notable_holdings_moving[0].player}} · {{customer.notable_holdings_moving[0].pct_change}} · floor {{customer.notable_holdings_moving[0].floor_today}}" },
+          { label: "Mover #2", value: "{{customer.notable_holdings_moving[1].player}} · {{customer.notable_holdings_moving[1].pct_change}} · last comp {{customer.notable_holdings_moving[1].recent_comp}}" },
+          { label: "Mover #3", value: "{{customer.notable_holdings_moving[2].player}} · {{customer.notable_holdings_moving[2].pct_change}} · last comp {{customer.notable_holdings_moving[2].recent_comp}}" },
+          { label: "Supply ratio", value: "63:1 today vs. 13:1 in Feb 2021 · context for floor reads" },
+        ],
+        body: [
+          "Round 2 priced what you bought in {{customer.first_session_at | date: \"%Y\"}}. Three positions moved on last week's tape. Comps above are last 7d clears in your serial band.",
+          "Floors held through Phase 4 elimination on the cohort tracked since G7.",
+        ],
+        cta: "Open your dashboard",
+        voice_notes:
+          "v1001 narrates Round 2 as a chronicled chapter and re-anchors collector identity. Frame C reports the tape: three deltas, three comps, supply-ratio context, exit. Reads as a position update on a wallet, not a re-engagement letter.",
+      },
     },
     reviewer_ask:
       "Three: (a) is the personalization scope right (BQ → Customer.io profile attribute sync for `notable_holdings_moving`), or do we need a simpler v1 with just one Moment? (b) two cohort variants (L1 never-bought vs. L2 with-purchases) — sufficient, or do we need finer cuts? (c) single touch, or 3-email drip?",
@@ -153,26 +249,112 @@ export const CARDS: UpgradeCard[] = [
         "This is a receipt, not a touchpoint. The single biggest emotional moment on the platform — pack-in-hand, three unknown Moments waiting — is delivered with the voice of a shipping confirmation. No set context, no legend, no marketplace data. The collector clicks once and leaves.",
     },
     after: {
-      label: "Proposed v1001 — Pack Received with set-chronicler voice + structured data",
-      from: "NBA Top Shot <hello@nbatopshot.com>",
-      subject: "Your {{event.packTitle}} just landed. Here's the set inside.",
-      preheader: "{{event.set_marquee_player}} headlines. {{event.setTier}} tier. {{event.setMomentCount}} Moments across the run.",
-      callouts: [
-        { label: "The set", value: "{{event.setName}} · {{event.setTier}} tier · {{event.setMomentCount}} Moments" },
-        { label: "Your pack", value: "3 Moments · serials already minted, already assigned" },
-        { label: "Marquee", value: "{{event.set_marquee_player}}" },
-      ],
-      body: [
-        "**{{event.setName}}** chronicles {{event.set_chronicler_note}}.",
-        "Three Moments inside this pack. The order packs were created determines the serials you pulled. Some collectors pull a #1 of a tier. Some pull a low-print parallel that won't appear in another pack for months.",
-        "**On the Marketplace this week, from {{event.setName}}:**",
-        "{% for sale in event.set_top_3_recent_sales %}",
-        "• {{sale.player}} {{sale.play}} cleared **{{sale.amount}}** ({{sale.sold_at | date: \"%b %-d\"}})",
-        "{% endfor %}",
-      ],
-      cta: "Open your pack",
-      voice_notes:
-        "Platform-chronicler. Opens with the set as a chronicler statement (\"{{setName}} chronicles X\"). Structured callouts above body, marketplace facts in body. No 'I,' no personal-letter, no Magic sign-off. Treats pack arrival as the launch of a chronicled set, not a personal moment.",
+      v1001: {
+        label: "Proposed v1001 — Pack Received with set-chronicler voice + structured data",
+        from: "NBA Top Shot <hello@nbatopshot.com>",
+        emailHero: {
+          src: "https://userimg-assets.customeriomail.com/images/client-env-161112/1740722955824_01-NEW-COLLECTOR-FIRST-PACK2_01JN5JRSMVBKXQ9YK4ESN8FFAS.jpg",
+          alt: "NBA Top Shot pack art",
+          liquidCaption: "Dynamic: {{event.packImageURL}}",
+        },
+        subject: "Your {{event.packTitle}} just landed. Here's the set inside.",
+        preheader: "{{event.set_marquee_player}} headlines. {{event.setTier}} tier. {{event.setMomentCount}} Moments across the run.",
+        callouts: [
+          { label: "The set", value: "{{event.setName}} · {{event.setTier}} tier · {{event.setMomentCount}} Moments" },
+          { label: "Your pack", value: "3 Moments · serials already minted, already assigned" },
+          { label: "Marquee", value: "{{event.set_marquee_player}}" },
+        ],
+        body: [
+          "**{{event.setName}}** chronicles {{event.set_chronicler_note}}.",
+          "Three Moments inside this pack. The order packs were created determines the serials you pulled. Some collectors pull a #1 of a tier. Some pull a low-print parallel that won't appear in another pack for months.",
+          "**On the Marketplace this week, from {{event.setName}}:**",
+          "{% for sale in event.set_top_3_recent_sales %}",
+          "• {{sale.player}} {{sale.play}} cleared **{{sale.amount}}** ({{sale.sold_at | date: \"%b %-d\"}})",
+          "{% endfor %}",
+        ],
+        cta: "Open your pack",
+        voice_notes:
+          "Platform-chronicler. Opens with the set as a chronicler statement (\"{{setName}} chronicles X\"). Structured callouts above body, marketplace facts in body. No 'I,' no personal-letter, no Magic sign-off. Treats pack arrival as the launch of a chronicled set, not a personal moment.",
+      },
+      almanac: {
+        label: "Frame A — Almanac · Pack Received with set-chronicler narrative",
+        from: "NBA Top Shot <hello@nbatopshot.com>",
+        emailHero: {
+          src: "{{event.packImageURL}}",
+          alt: "{{event.packTitle}} pack art",
+          liquidCaption: "{{event.setName}} · {{event.setTier}} tier",
+        },
+        subject: "Your {{event.packTitle}} just landed. The set inside, chronicled.",
+        preheader: "{{event.set_marquee_player}} headlines. {{event.setTier}} tier. {{event.setMomentCount}} Moments across the run.",
+        callouts: [
+          { label: "The set", value: "{{event.setName}} · {{event.setTier}} tier · {{event.setMomentCount}} Moments across the run" },
+          { label: "Your pack", value: "3 Moments · serials already minted, already assigned to you" },
+          { label: "Marquee", value: "{{event.set_marquee_player}}" },
+          { label: "Set chronicled by", value: "{{event.set_curator_name}}" },
+        ],
+        body: [
+          "**{{event.setName}}** chronicles {{event.set_chronicler_note}}.",
+          "Three Moments are inside this pack. They were minted before the pack was assembled, and the order packs were created determines the serials you pulled. Some collectors open the first pack of a set and find a #1 of the tier. Some open the last pack of a set and find a low-print parallel that will not appear in another pack for months. The serial is the document; the document is permanent.",
+          "Every Moment on Top Shot is a play that actually happened — pulled from the live broadcast, minted on its own serial, owned by you. Not a clip. Not a trading-card scan. The play itself, with the serial number that proves who held it first.",
+          "**On the Marketplace this week, from {{event.setName}}:**",
+          "{% for sale in event.set_top_3_recent_sales %}",
+          "- {{sale.player}} {{sale.play}} cleared **{{sale.amount}}** ({{sale.sold_at | date: \"%b %-d\"}})",
+          "{% endfor %}",
+          "Open your pack to see which three Moments — and which three serials — were assigned to you.",
+        ],
+        cta: "Open your pack",
+        voice_notes:
+          "Frame A treats the set as an artifact being chronicled, not an inventory item being shipped. The \"play itself, not a clip\" line is a deliberate counter to the \"five-second video\" critique surfaced in lapsed-collector sentiment (Theme B-2). Three recent comp sales embed C-evidence inside a B-narrative. v1001 is tight and structural; v1002 lingers on serial-as-document and the permanence frame, then closes with the \"which three serials were assigned to you\" curiosity gap.",
+      },
+      cinematic: {
+        label: "Frame B — Cinematic · Pack Received",
+        from: "NBA Top Shot <drops@nbatopshot.com>",
+        emailHero: {
+          src: "{{event.packImageURL}}",
+          alt: "Your {{event.packTitle}} pack",
+          liquidCaption: "Dynamic per pack — full-bleed pack art is the hero",
+        },
+        subject: "Three Moments. Already yours.",
+        preheader: "{{event.set_marquee_player}} headlines. The serials are minted.",
+        callouts: [
+          { label: "The set", value: "{{event.setName}} · {{event.setTier}}" },
+          { label: "Circulation", value: "{{event.setMomentCount}} Moments" },
+          { label: "Inside", value: "3 serials · already assigned" },
+        ],
+        body: [
+          "**The plays already happened.** Now they're yours.",
+          "Three Moments inside. **Real serials. On-chain. The footage of the second it happened** — not a clip, not a card scan.",
+          "{{event.set_marquee_player}} headlines this run.",
+        ],
+        cta: "OPEN THE PACK",
+        voice_notes:
+          "Frame B treats pack arrival as a cinematic reveal, not a chronicled set launch. v1001 led with set chronicler-note + marketplace comp data. v1002 leans on the documentary frame (\"the footage of the second it happened\") as mythic positioning vs. Topps Now / YouTube highlights. Three callout rows, three short body lines, one dramatic CTA.",
+      },
+      brief: {
+        label: "Frame C — Brief · Pack Receipt",
+        from: "NBA Top Shot Marketplace <market@nbatopshot.com>",
+        emailHero: {
+          src: "https://userimg-assets.customeriomail.com/images/client-env-161112/setcard_{{event.setFlowID}}.png",
+          alt: "Set data card — circulation, tier, marquee",
+          liquidCaption: "Dynamic data card per set; small footprint, no full-bleed art",
+        },
+        subject: "Pack landed: {{event.setName}} · marquee {{event.set_marquee_player}}.",
+        preheader: "{{event.setTier}} tier · 3 Moments · last 7d clears below.",
+        callouts: [
+          { label: "Set", value: "{{event.setName}} · {{event.setTier}} · {{event.setMomentCount}} Moments" },
+          { label: "Pack", value: "3 Moments · serials assigned at mint" },
+          { label: "Marquee", value: "{{event.set_marquee_player}}" },
+          { label: "7d set volume", value: "{{event.set_7d_volume_count}} sales · median {{event.set_7d_median_price}}" },
+          { label: "Top clear (7d)", value: "{{event.set_top_3_recent_sales[0].player}} · {{event.set_top_3_recent_sales[0].amount}} · {{event.set_top_3_recent_sales[0].sold_at | date: \"%b %-d\"}}" },
+          { label: "Floor", value: "{{event.set_floor_today}} · {{event.set_floor_change_7d}} vs 7d ago" },
+        ],
+        body: [
+          "Pack delivered. Set is live on the secondary; recent comps above. Open inside the app to reveal serials.",
+        ],
+        cta: "Open your pack",
+        voice_notes:
+          "v1001 frames the pack as the launch of a chronicled set. Frame C frames it as a position acquired into a live secondary market — set tape, floor, top clear, all visible on receipt.",
+      },
     },
     reviewer_ask:
       "Two: (a) does pre-open (current trigger) work, or should this fire on pack-open with the actual Moments in hand? (b) `event.set_chronicler_note` — curated per set or pulled from set metadata? Curator note keeps voice tight; metadata is automatable.",
@@ -224,23 +406,102 @@ export const CARDS: UpgradeCard[] = [
         "Subject has a typo (\"got a so much\"). Body has zero text — five linked images and app-store badges. No personalization, no set context, no marketplace data. Sent 207k times. Open rate held at 38.6% on brand alone, click rate collapsed to 1.7%.",
     },
     after: {
-      label: "Proposed Welcome v1001 — Email 1 (D0)",
-      from: "NBA Top Shot <welcome@nbatopshot.com>",
-      subject: "Welcome to NBA Top Shot.",
-      preheader: "Your free pack is loaded. Three Moments inside.",
-      callouts: [
-        { label: "Your free pack", value: "3 Moments · serials already minted" },
-        { label: "Tonight in the Playoffs", value: "{{week.featured_games}} · Round 2 live" },
-        { label: "Where collectors talk", value: "Discord · The Show · Top Shot Live" },
-      ],
-      body: [
-        "Every Moment on Top Shot is a play that actually happened — pulled from the live broadcast, minted on its own serial, owned by you. Not a clip. Not a trading-card scan. The play itself.",
-        "**Your free pack** has three Moments inside. Already minted, already yours. The order packs were created determines what you pulled.",
-        "**Round 2 of the 2026 Playoffs is live this week.** {{week.featured_games}}. The Moments minted from this postseason will be priced against by the next year of the market. Walking in this week means you're holding receipts on history before the rest of the market is loud.",
-      ],
-      cta: "Open your free pack",
-      voice_notes:
-        "Platform voice with structural definition of what the platform IS in line one. Structured callouts deliver the basketball context + community context up front. Body chronicles the live Playoffs week as the entry frame. No 'I,' no Magic sign-off, no personal P.S. Pure platform.",
+      v1001: {
+        label: "Proposed Welcome v1001 — Email 1 (D0)",
+        from: "NBA Top Shot <welcome@nbatopshot.com>",
+        emailHero: {
+          src: "https://userimg-assets.customeriomail.com/images/client-env-161112/1733254430310_04-MORE-THAN-MOMENTS_01_01JE707FKDZM5GN3VEF7G26DYG.jpg",
+          alt: "NBA Top Shot — More than Moments",
+        },
+        subject: "Welcome to NBA Top Shot.",
+        preheader: "Your free pack is loaded. Three Moments inside.",
+        callouts: [
+          { label: "Your free pack", value: "3 Moments · serials already minted" },
+          { label: "Tonight in the Playoffs", value: "{{week.featured_games}} · Round 2 live" },
+          { label: "Where collectors talk", value: "Discord · The Show · Top Shot Live" },
+        ],
+        body: [
+          "Every Moment on Top Shot is a play that actually happened — pulled from the live broadcast, minted on its own serial, owned by you. Not a clip. Not a trading-card scan. The play itself.",
+          "**Your free pack** has three Moments inside. Already minted, already yours. The order packs were created determines what you pulled.",
+          "**Round 2 of the 2026 Playoffs is live this week.** {{week.featured_games}}. The Moments minted from this postseason will be priced against by the next year of the market. Walking in this week means you're holding receipts on history before the rest of the market is loud.",
+        ],
+        cta: "Open your free pack",
+        voice_notes:
+          "Platform voice with structural definition of what the platform IS in line one. Structured callouts deliver the basketball context + community context up front. Body chronicles the live Playoffs week as the entry frame. No 'I,' no Magic sign-off, no personal P.S. Pure platform.",
+      },
+      almanac: {
+        label: "Frame A — Almanac · Welcome Email 1 (D0)",
+        from: "NBA Top Shot <welcome@nbatopshot.com>",
+        emailHero: {
+          src: "https://userimg-assets.customeriomail.com/images/client-env-161112/1733254430310_04-MORE-THAN-MOMENTS_01_01JE707FKDZM5GN3VEF7G26DYG.jpg",
+          alt: "NBA Top Shot — More than Moments",
+        },
+        subject: "Welcome to NBA Top Shot. Here is the platform you just joined.",
+        preheader: "Your free pack is loaded. Three Moments inside. The 2026 Playoffs are live this week.",
+        callouts: [
+          { label: "Your free pack", value: "3 Moments · serials already minted, already assigned" },
+          { label: "Tonight in the Playoffs", value: "{{week.featured_games}} · Round 2 live" },
+          { label: "Where collectors talk", value: "Discord · The Show · Top Shot Live" },
+          { label: "What you actually own", value: "The play itself, on its own serial, on-chain" },
+        ],
+        body: [
+          "Every Moment on NBA Top Shot is a play that actually happened — pulled from the live broadcast, minted on its own serial, owned by you. Not a clip. Not a card scan. The play itself, with the serial number that proves who held it first.",
+          "**Your free pack** has three Moments inside. They were minted before the pack was assembled, and the order packs were created determines what you pulled. Open it to see which three.",
+          "**Round 2 of the 2026 Playoffs is live this week.** {{week.featured_games}}. The Moments minted from this postseason will be priced against by the next year of the secondary market. Walking in this week means you are holding receipts on history before the rest of the market is loud about it.",
+          "A note for what comes next. The collectors who have been here longest treat this as a long form. They learn the sets. They watch which serials trade and at what comp. They follow Flash Challenges and Fast Break for the daily rhythm. They use Discord and the Show as the room where the conversation lives. None of it is required to enjoy the platform. All of it is available when you are ready.",
+        ],
+        cta: "Open your free pack",
+        voice_notes:
+          "Frame A welcomes a new collector by defining the platform in the opening line — directly answering the \"what is this thing\" question that the NFT/crypto stigma (Theme C-1) creates as a discovery-layer trust hole. Closes with a calm map of how long-time collectors actually use the platform — Flash Challenges, Discord, the Show, Fast Break — without demanding anything. v1001 is structurally similar but more compact; v1002 trades brevity for the chronicler-statesman voice that signals \"you joined a real community, not a brand.\"",
+      },
+      cinematic: {
+        label: "Frame B — Cinematic · Welcome",
+        from: "NBA Top Shot <drops@nbatopshot.com>",
+        emailHero: {
+          src: "https://userimg-assets.customeriomail.com/images/client-env-161112/1747166167882_03-PACKS-ARE-YOUR-DOORWAY-TO-GREATNESSNEW2_01JV5KFXMNRPTA0J24ESESYX7N.jpg",
+          alt: "NBA Top Shot — Packs are your doorway to greatness",
+        },
+        subject: "The Cooper Flagg Era begins here.",
+        preheader: "Your free pack is loaded. The Playoffs are live tonight.",
+        callouts: [
+          { label: "Your free pack", value: "3 Moments · serials minted" },
+          { label: "Tonight", value: "{{week.featured_games}}" },
+          { label: "Coming May 20", value: "Cooper Flagg · Drop 1" },
+        ],
+        body: [
+          "**Welcome to the documentary.**",
+          "Every Moment is a play that actually happened. **Your serial. On-chain. Yours.**",
+          "Round 2 is live tonight. Cooper Flagg drops in two weeks. **You walked in at the right time.**",
+        ],
+        cta: "OPEN YOUR FREE PACK",
+        voice_notes:
+          "Frame B onboarding leans entirely on the cultural-breakthrough wedge — Cooper Flagg as the arrival event the new collector is now positioned for. v1001 was definition-first (\"every Moment is a play that actually happened…\") with structured Round 2 chronicling. v1002 strips it to three declarative beats. Sentiment theme 1 (Cooper Flagg) plus theme 2 (Playoffs daily loop \"this season has been the best one yet\") in the same email.",
+      },
+      brief: {
+        label: "Frame C — Brief · Day 0",
+        from: "NBA Top Shot Brief <brief@nbatopshot.com>",
+        emailHero: {
+          src: "https://userimg-assets.customeriomail.com/images/client-env-161112/market_dashboard_thumb.png",
+          alt: "Marketplace dashboard preview — floor by tier, 7d volume",
+          liquidCaption: "Static dashboard thumbnail; daily-updated version lives in app",
+        },
+        subject: "Day 0 brief: free pack loaded, Round 2 live this week.",
+        preheader: "3 Moments inside · weekly market read starts now.",
+        callouts: [
+          { label: "Your account", value: "Free pack · 3 Moments · serials minted" },
+          { label: "Round 2", value: "{{week.featured_games}} · live this week" },
+          { label: "Marketplace 7d", value: "{{market.weekly_sales_count}} sales · median {{market.weekly_median_price}}" },
+          { label: "Active sets", value: "{{market.active_set_count}} · {{market.new_drops_this_week}} new this week" },
+          { label: "Licensed", value: "Official NBA license · provenance on-chain · 1-of-{{market.serial_max}} per Moment" },
+          { label: "Brief cadence", value: "Weekly · what moved + why" },
+        ],
+        body: [
+          "Each Moment is a licensed NBA play with a fixed serial. Round 2 is the live tape. Open the free pack; weekly brief follows.",
+        ],
+        cta: "Open your free pack",
+        voice_notes:
+          "v1001 defines what the platform IS in collector-philosophy register. Frame C defines what the platform IS in market-data register: licensed, on-chain provenance, weekly tape. Same product, sold to the data-first reader.",
+      },
     },
     reviewer_ask:
       "Two: (a) given BQ shows dark-window signups already converting better, do we still want to restart welcome? My take: yes, on the lifecycle-hygiene + brand-integrity case. (b) week-aware Liquid (`week.featured_games`) — keeps content fresh but needs a feed; worth wiring or hardcode each NBA week?",
@@ -290,23 +551,101 @@ export const CARDS: UpgradeCard[] = [
         "Two problems. (1) Production defect: the Liquid `{{ event[` is incomplete — closing bracket and field name are missing. The claim URL is not a working URL. (2) Voice is brand-celebratory exclamatory with two grammar misses. Win moment is the highest-engagement Fast Break event and we deliver it with broken plumbing and no substance.",
     },
     after: {
-      label: "Proposed v1001 — fixed Liquid + structured production-recap voice",
-      from: "NBA Top Shot <fastbreak@nbatopshot.com>",
-      subject: "Your Fast Break lineup hit. Pack waiting.",
-      preheader: "{{event.lineupSummary}} · {{event.totalScore}} pts · {{event.winRank}} on the slate",
-      callouts: [
-        { label: "Lineup", value: "{{event.lineupPlayers}}" },
-        { label: "Production", value: "{{event.totalScore}} pts across {{event.gameCount}} games" },
-        { label: "Rank", value: "{{event.winRank}} on the slate" },
-        { label: "Reward", value: "NBA Top Shot Pack · 10 Moments featuring this season's most-used Fast Break players" },
-      ],
-      body: [
-        "Lineup logged. Win confirmed.",
-        "Pack is in your account. Tap below to claim.",
-      ],
-      cta: "Claim your pack",
-      voice_notes:
-        "Production fix is non-negotiable (broken Liquid). Voice upgrade adds structured callouts: lineup recap, point production, rank — gives the email substance beyond \"you won.\" No 'I.' Tight, factual, celebratory through structure not exclamation.",
+      v1001: {
+        label: "Proposed v1001 — fixed Liquid + structured production-recap voice",
+        from: "NBA Top Shot <fastbreak@nbatopshot.com>",
+        emailHero: {
+          src: "https://userimg-assets.customeriomail.com/images/client-env-161112/1734135875841_tier4_01JF18V2BX0TMRW39EA1J2FETP.gif",
+          alt: "NBA Top Shot Fast Break tiers",
+        },
+        subject: "Your Fast Break lineup hit. Pack waiting.",
+        preheader: "{{event.lineupSummary}} · {{event.totalScore}} pts · {{event.winRank}} on the slate",
+        callouts: [
+          { label: "Lineup", value: "{{event.lineupPlayers}}" },
+          { label: "Production", value: "{{event.totalScore}} pts across {{event.gameCount}} games" },
+          { label: "Rank", value: "{{event.winRank}} on the slate" },
+          { label: "Reward", value: "NBA Top Shot Pack · 10 Moments featuring this season's most-used Fast Break players" },
+        ],
+        body: [
+          "Lineup logged. Win confirmed.",
+          "Pack is in your account. Tap below to claim.",
+        ],
+        cta: "Claim your pack",
+        voice_notes:
+          "Production fix is non-negotiable (broken Liquid). Voice upgrade adds structured callouts: lineup recap, point production, rank — gives the email substance beyond \"you won.\" No 'I.' Tight, factual, celebratory through structure not exclamation.",
+      },
+      almanac: {
+        label: "Frame A — Almanac · Fast Break win recap (production-fix + voice)",
+        from: "NBA Top Shot <fastbreak@nbatopshot.com>",
+        emailHero: {
+          src: "https://userimg-assets.customeriomail.com/images/client-env-161112/1734135875841_tier4_01JF18V2BX0TMRW39EA1J2FETP.gif",
+          alt: "Fast Break tiers",
+        },
+        subject: "Your Fast Break lineup hit. Here is what your night produced.",
+        preheader: "{{event.lineupSummary}} · {{event.totalScore}} points · ranked {{event.winRank}} on the slate",
+        callouts: [
+          { label: "Lineup", value: "{{event.lineupPlayers}}" },
+          { label: "Production", value: "{{event.totalScore}} points across {{event.gameCount}} games" },
+          { label: "Slate rank", value: "{{event.winRank}}" },
+          { label: "Reward", value: "NBA Top Shot Pack · 10 Moments featuring this season's most-used Fast Break players" },
+        ],
+        body: [
+          "Lineup logged. Win confirmed. Pack waiting in your account.",
+          "{{event.lineupPlayers}} produced {{event.totalScore}} points across {{event.gameCount}} games tonight. That ranked **{{event.winRank}}** on a slate where most lineups did not clear the threshold. The collectors who hit Fast Break consistently are the ones reading minutes-restriction news in the morning and rotating bench-heavy lineups in the late slate. The lineup that hit tonight was the right lineup tonight.",
+          "Your pack contains 10 Moments featuring this season's most-used Fast Break players. The serials are already minted. Tap below to claim and open.",
+        ],
+        cta: "Claim your pack",
+        voice_notes:
+          "Production fix is non-negotiable; the broken Liquid URL and \"a NBA\" grammar miss have to ship today. Frame A's voice upgrade celebrates the win through structure, not exclamation — the chronicler-statesman names the craft (\"reading minutes-restriction news in the morning\"), which respects the lower-TSS collector who actually hits Fast Break (Theme A-2 sentiment: lower-tier collectors feel locked out of leaderboards; Fast Break is one of the loops where they can win). Tighter than other Frame A cards because the email is a recap, not a long-form read.",
+      },
+      cinematic: {
+        label: "Frame B — Cinematic · Fast Break Win",
+        from: "NBA Top Shot <fastbreak@nbatopshot.com>",
+        emailHero: {
+          src: "https://userimg-assets.customeriomail.com/images/client-env-161112/1734135875841_tier4_01JF18V2BX0TMRW39EA1J2FETP.gif",
+          alt: "NBA Top Shot Fast Break tiers — animated tier reveal",
+        },
+        subject: "You called it. Pack waiting.",
+        preheader: "{{event.totalScore}} points. {{event.winRank}} on the slate.",
+        callouts: [
+          { label: "Lineup", value: "{{event.lineupPlayers}}" },
+          { label: "Production", value: "{{event.totalScore}} pts" },
+          { label: "Slate rank", value: "{{event.winRank}}" },
+        ],
+        body: [
+          "**The lineup hit.**",
+          "{{event.totalScore}} points across {{event.gameCount}} games. **You read the slate.**",
+          "A pack is in your account. **10 Moments.** This season's most-used Fast Break players.",
+        ],
+        cta: "CLAIM THE PACK",
+        voice_notes:
+          "Frame B turns the win moment into a cinematic confirmation. v1001 was structured production-recap (\"Lineup logged. Win confirmed.\"). v1002 sharpens to the mythic register — \"You called it\" leans on the \"Called It\" WOM engine flagged in the SoT primary-audience section (gambler-collector, the core acquisition mechanic). Production fix (broken Liquid `{{ event[`) is non-negotiable; voice is the upgrade. Sentiment theme 2 (daily Fast Break game-loop hook) is the emotional anchor.",
+      },
+      brief: {
+        label: "Frame C — Brief · Fast Break Result",
+        from: "NBA Top Shot Brief <brief@nbatopshot.com>",
+        emailHero: {
+          src: "https://userimg-assets.customeriomail.com/images/client-env-161112/fb_scorecard_{{event.fastBreakId}}.png",
+          alt: "Fast Break scorecard — lineup, points, rank",
+          liquidCaption: "Dynamic scorecard per result; no full-bleed celebration art",
+        },
+        subject: "Lineup hit · {{event.totalScore}} pts · rank {{event.winRank}}.",
+        preheader: "Pack credited. {{event.lineupSummary}}.",
+        callouts: [
+          { label: "Lineup", value: "{{event.lineupPlayers}}" },
+          { label: "Production", value: "{{event.totalScore}} pts · {{event.gameCount}} games" },
+          { label: "Slate rank", value: "{{event.winRank}}" },
+          { label: "Reward", value: "Pack · 10 Moments · most-used Fast Break players this season" },
+          { label: "Claim window", value: "Open until {{event.claim_expires_at | date: \"%b %-d, %-l %p ET\"}}" },
+          { label: "Streak", value: "{{customer.fastbreak_win_streak}} · {{customer.fastbreak_lifetime_wins}} lifetime" },
+        ],
+        body: [
+          "Lineup logged. Pack credited to your account. Claim before the window closes.",
+        ],
+        cta: "Claim your pack",
+        voice_notes:
+          "v1001 keeps celebration tight through structure. Frame C strips the celebration entirely: it's a result row in a tape feed. Production fix on broken Liquid (`?fastBreakId={{event.fastBreakId}}`) still ships day one regardless of voice version.",
+      },
     },
     reviewer_ask:
       "First: production defect ships today. ENG fix template 1133 broken Liquid URL (2 occurrences) immediately. Second: do `event.lineupPlayers`, `event.totalScore`, `event.winRank`, `event.gameCount`, `event.lineupSummary` exist on the result event payload — or do we need to add them?",
@@ -348,24 +687,108 @@ export const CARDS: UpgradeCard[] = [
       ],
     },
     after: {
-      label: "Proposed v1001 — Drop Announce Email 1 (pre-drop, programmatic, Liquid-driven)",
-      from: "NBA Top Shot <drops@nbatopshot.com>",
-      subject: "{{drop.name}} drops {{drop.live_at | date: \"%A %-l %p ET\"}}.",
-      preheader: "{{drop.tier}} tier · {{drop.set_name}} · {{drop.featured_player_marquee}}",
-      callouts: [
-        { label: "The set", value: "{{drop.set_name}} · {{drop.tier}} tier · {{drop.circulation_total}} circulation across {{drop.moment_count}} Moments" },
-        { label: "Marquee", value: "{{drop.featured_player_marquee}}" },
-        { label: "Pack price", value: "{{drop.starting_price}}" },
-        { label: "Queue opens", value: "{{drop.queue_open_at | date: \"%A %B %-d at %-l:%M %p ET\"}}" },
-      ],
-      body: [
-        "**{{drop.set_name}}** {{drop.curator_note}}",
-        "**The legend.** {{drop.featured_player_legend}}",
-        "**Pre-pack rate this week** is running at {{market.recent_drop_velocity}}. {{drop.expected_serial_distribution}}.",
-      ],
-      cta: "Set a reminder",
-      voice_notes:
-        "Image-led (drop art occupies the hero). Structured-callout dense. Curator (Guy / Sam) writes ONE paragraph per drop — `drop.curator_note` and `drop.featured_player_legend`. Everything else is templated. Trading-card-company chronicler voice: sensationalize the legend, factually report the numbers.",
+      v1001: {
+        label: "Proposed v1001 — Drop Announce Email 1 (pre-drop, programmatic, Liquid-driven)",
+        from: "NBA Top Shot <drops@nbatopshot.com>",
+        emailHero: {
+          src: "https://userimg-assets.customeriomail.com/images/client-env-161112/1734135959963_04-MORE-THAN-MOMENTS-bottom_01JF18XMG4SDNNGA4Q6Y9W91A4.jpg",
+          alt: "NBA Top Shot drop art",
+          liquidCaption: "Dynamic: {{drop.hero_image}} · curator-provided per drop",
+        },
+        subject: "{{drop.name}} drops {{drop.live_at | date: \"%A %-l %p ET\"}}.",
+        preheader: "{{drop.tier}} tier · {{drop.set_name}} · {{drop.featured_player_marquee}}",
+        callouts: [
+          { label: "The set", value: "{{drop.set_name}} · {{drop.tier}} tier · {{drop.circulation_total}} circulation across {{drop.moment_count}} Moments" },
+          { label: "Marquee", value: "{{drop.featured_player_marquee}}" },
+          { label: "Pack price", value: "{{drop.starting_price}}" },
+          { label: "Queue opens", value: "{{drop.queue_open_at | date: \"%A %B %-d at %-l:%M %p ET\"}}" },
+        ],
+        body: [
+          "**{{drop.set_name}}** {{drop.curator_note}}",
+          "**The legend.** {{drop.featured_player_legend}}",
+          "**Pre-pack rate this week** is running at {{market.recent_drop_velocity}}. {{drop.expected_serial_distribution}}.",
+        ],
+        cta: "Set a reminder",
+        voice_notes:
+          "Image-led (drop art occupies the hero). Structured-callout dense. Curator (Guy / Sam) writes ONE paragraph per drop — `drop.curator_note` and `drop.featured_player_legend`. Everything else is templated. Trading-card-company chronicler voice: sensationalize the legend, factually report the numbers.",
+      },
+      almanac: {
+        label: "Frame A — Almanac · Drop Announce Email 1 (pre-drop, programmatic)",
+        from: "NBA Top Shot <drops@nbatopshot.com>",
+        emailHero: {
+          src: "{{drop.hero_image}}",
+          alt: "{{drop.set_name}} drop art",
+          liquidCaption: "{{drop.set_name}} · {{drop.tier}} tier · curated by {{drop.curator_name}}",
+        },
+        subject: "{{drop.name}} drops {{drop.live_at | date: \"%A %-l %p ET\"}}.",
+        preheader: "{{drop.tier}} tier · {{drop.set_name}} · {{drop.featured_player_marquee}}",
+        callouts: [
+          { label: "The set", value: "{{drop.set_name}} · {{drop.tier}} tier · {{drop.circulation_total}} circulation across {{drop.moment_count}} Moments" },
+          { label: "Marquee", value: "{{drop.featured_player_marquee}}" },
+          { label: "Pack price", value: "{{drop.starting_price}}" },
+          { label: "Queue opens", value: "{{drop.queue_open_at | date: \"%A %B %-d at %-l:%M %p ET\"}}" },
+          { label: "Recent drop velocity", value: "{{market.recent_drop_velocity}}" },
+        ],
+        body: [
+          "**{{drop.set_name}}.** {{drop.curator_note}}",
+          "**The legend.** {{drop.featured_player_legend}}",
+          "The discipline of the 2025–26 season has been smaller circulation, tighter sets, and rookies capped under 5,000 — Cooper Flagg, Wembanyama, the cohort that defines what a Top Shot rookie tier looks like in the new era. The collectors who watched the 13-Moments-per-buyer ratio invert during the 2021–2023 supply flood are the ones who notice when supply discipline holds. This drop is built inside that discipline.",
+          "**What the recent market is saying.** Pre-pack velocity this week is running at {{market.recent_drop_velocity}}. {{drop.expected_serial_distribution}}. The Moments most likely to set the comp band first will be {{drop.likely_first_movers}}.",
+          "Queue opens {{drop.queue_open_at | date: \"%A %B %-d at %-l:%M %p ET\"}}. Set your reminder if you want a fair shot at the marquee tier.",
+        ],
+        cta: "Set a reminder",
+        voice_notes:
+          "Frame A holds the drop announcement to chronicler register — no countdowns, no urgency theater. The supply-discipline paragraph directly addresses Theme 6 from the sentiment synthesis (long collector memory for the 2021–23 supply mismanagement) by explicitly naming the change: rookies capped under 5,000, smaller circulations, the discipline holding. Curator (Guy / Sam) writes one paragraph per drop — `drop.curator_note` and `drop.featured_player_legend`. Everything else templated. v1001 is briefer; v1002 takes the extra paragraph to ground the drop in the platform's stated supply pivot, which is the trust signal that matters most to long-time holders.",
+      },
+      cinematic: {
+        label: "Frame B — Cinematic · Drop Announcement",
+        from: "NBA Top Shot <drops@nbatopshot.com>",
+        emailHero: {
+          src: "{{drop.hero_image}}",
+          alt: "{{drop.set_name}} drop art",
+          liquidCaption: "Curator-provided full-bleed drop art per drop",
+        },
+        subject: "{{drop.name}}. {{drop.live_at | date: \"%A %-l %p ET\"}}.",
+        preheader: "{{drop.circulation_total}} circulation. {{drop.featured_player_marquee}} headlines.",
+        callouts: [
+          { label: "Set", value: "{{drop.set_name}} · {{drop.tier}}" },
+          { label: "Circulation", value: "{{drop.circulation_total}} across {{drop.moment_count}} Moments" },
+          { label: "Pack price", value: "{{drop.starting_price}}" },
+        ],
+        body: [
+          "**{{drop.featured_player_legend}}**",
+          "{{drop.live_at | date: \"%A, %B %-d. %-l %p ET.\"}} **{{drop.circulation_total}} packs.** Queue opens {{drop.queue_open_at | date: \"%-l:%M %p ET\"}}.",
+          "**One generation defines the next.**",
+        ],
+        cta: "SET THE REMINDER",
+        voice_notes:
+          "This is the prototype Frame B email — the \"Cooper Flagg Era begins\" exhibit voice applied programmatically. v1001 leaned on curator chronicler-note + market velocity context in the body. v1002 is poster-headline brevity: legend statement, time/scarcity facts, mythic closer. Curator (Guy/Sam) writes ONE legend line per drop (`drop.featured_player_legend`); everything else is templated. Sentiment theme 1 (Cooper Flagg / scarcity narrative) is the running thread when this fires for the May 20 drop.",
+      },
+      brief: {
+        label: "Frame C — Brief · Drop Calendar",
+        from: "NBA Top Shot Brief <brief@nbatopshot.com>",
+        emailHero: {
+          src: "https://userimg-assets.customeriomail.com/images/client-env-161112/drop_datacard_{{drop.id}}.png",
+          alt: "Drop data card — tier, circulation, queue time, marquee",
+          liquidCaption: "Dynamic data card per drop; full set art lives one click in",
+        },
+        subject: "{{drop.name}} live {{drop.live_at | date: \"%a %-l %p ET\"}} · {{drop.tier}} · {{drop.starting_price}}.",
+        preheader: "{{drop.set_name}} · {{drop.circulation_total}} circulation · marquee {{drop.featured_player_marquee}}.",
+        callouts: [
+          { label: "Set", value: "{{drop.set_name}} · {{drop.tier}} · {{drop.moment_count}} Moments" },
+          { label: "Circulation", value: "{{drop.circulation_total}} total · {{drop.serial_max}} max serial" },
+          { label: "Pack price", value: "{{drop.starting_price}}" },
+          { label: "Queue opens", value: "{{drop.queue_open_at | date: \"%a %b %-d, %-l:%M %p ET\"}}" },
+          { label: "Live", value: "{{drop.live_at | date: \"%a %-l:%M %p ET\"}}" },
+          { label: "Last comparable drop", value: "{{drop.previous_comparable.set_name}} · sold out in {{drop.previous_comparable.sellout_minutes}}m · floor today {{drop.previous_comparable.floor_today}}" },
+        ],
+        body: [
+          "Drop calendar entry. Queue mechanics fair-allocation, not first-come. Comp drop above shows secondary trajectory.",
+        ],
+        cta: "Set a reminder",
+        voice_notes:
+          "v1001 lets a curator sensationalize the legend per drop. Frame C reduces every drop to one row in a calendar feed: tier, circulation, queue time, comparable secondary print. Calm pre-event read for collectors who already know who Cooper Flagg is.",
+      },
     },
     reviewer_ask:
       "Two: (a) is the curator-writes-one-paragraph structure right, or does each drop need bespoke design? (b) timing — pre-drop email at T-24h, T-2h, or both?",
@@ -414,26 +837,111 @@ export const CARDS: UpgradeCard[] = [
         "Sports-cliché opener does the brand a disservice. \"Decided to pass instead of taking the shot\" is condescending. Liquid scaffolding is solid — every variable is the right one — but the wrapper around it doesn't deliver any substance. No comp data, no set context, no urgency grounded in fact. Just a metaphor.",
     },
     after: {
-      label: "Proposed v1001 — voice swap, same Liquid scaffolding, comp data added",
-      from: "NBA Top Shot <marketplace@nbatopshot.com>",
-      subject: "{{event.player}} {{event.playCategory}} — still open on the Marketplace.",
-      preheader: "{{event.setName}} · {{event.tier}} tier · serial #{{event.serial}}",
-      callouts: [
-        { label: "The Moment", value: "{{event.player}} — {{event.playCategory}}" },
-        { label: "The set", value: "{{event.setName}} · {{event.tier}} tier · {{event.circulationCount}} mints" },
-        { label: "Your serial", value: "#{{event.serial}}" },
-      ],
-      body: [
-        "{{event.set_chronicler_note}}",
-        "**Recent comparable sales** in this serial band:",
-        "{% for sale in event.recent_serial_band_sales %}",
-        "• Serial range {{sale.serial_range}} cleared **{{sale.amount}}** on {{sale.sold_at | date: \"%b %-d\"}}",
-        "{% endfor %}",
-        "**Listing intact.** The Moment hasn't moved.",
-      ],
-      cta: "Finish your purchase",
-      voice_notes:
-        "Drops the cliché. Keeps every Liquid var. Adds structured callouts and comp-data block — substance instead of metaphor. No 'I,' no personal-letter tone. Pure factual chronicler-of-the-marketplace voice.",
+      v1001: {
+        label: "Proposed v1001 — voice swap, same Liquid scaffolding, comp data added",
+        from: "NBA Top Shot <marketplace@nbatopshot.com>",
+        emailHero: {
+          src: "https://userimg-assets.customeriomail.com/images/client-env-161112/1747166167882_03-PACKS-ARE-YOUR-DOORWAY-TO-GREATNESSNEW2_01JV5KFXMNRPTA0J24ESESYX7N.jpg",
+          alt: "NBA Top Shot Moment",
+          liquidCaption: "Dynamic: assets.nbatopshot.com/media/{{event.momentFlowID}}/image",
+        },
+        subject: "{{event.player}} {{event.playCategory}} — still open on the Marketplace.",
+        preheader: "{{event.setName}} · {{event.tier}} tier · serial #{{event.serial}}",
+        callouts: [
+          { label: "The Moment", value: "{{event.player}} — {{event.playCategory}}" },
+          { label: "The set", value: "{{event.setName}} · {{event.tier}} tier · {{event.circulationCount}} mints" },
+          { label: "Your serial", value: "#{{event.serial}}" },
+        ],
+        body: [
+          "{{event.set_chronicler_note}}",
+          "**Recent comparable sales** in this serial band:",
+          "{% for sale in event.recent_serial_band_sales %}",
+          "• Serial range {{sale.serial_range}} cleared **{{sale.amount}}** on {{sale.sold_at | date: \"%b %-d\"}}",
+          "{% endfor %}",
+          "**Listing intact.** The Moment hasn't moved.",
+        ],
+        cta: "Finish your purchase",
+        voice_notes:
+          "Drops the cliché. Keeps every Liquid var. Adds structured callouts and comp-data block — substance instead of metaphor. No 'I,' no personal-letter tone. Pure factual chronicler-of-the-marketplace voice.",
+      },
+      almanac: {
+        label: "Frame A — Almanac · Abandoned cart with comp-band evidence",
+        from: "NBA Top Shot <marketplace@nbatopshot.com>",
+        emailHero: {
+          src: "https://assets.nbatopshot.com/media/{{event.momentFlowID}}/image",
+          alt: "{{event.player}} {{event.playCategory}} Moment",
+          liquidCaption: "{{event.setName}} · serial #{{event.serial}}",
+        },
+        subject: "{{event.player}} {{event.playCategory}} — your listing is still open.",
+        preheader: "{{event.setName}} · {{event.tier}} tier · serial #{{event.serial}} · listing intact",
+        callouts: [
+          { label: "The Moment", value: "{{event.player}} — {{event.playCategory}}" },
+          { label: "The set", value: "{{event.setName}} · {{event.tier}} tier · {{event.circulationCount}} mints" },
+          { label: "Your serial", value: "#{{event.serial}}" },
+          { label: "Listing", value: "Intact · the Moment has not moved" },
+        ],
+        body: [
+          "{{event.set_chronicler_note}}",
+          "You opened a cart on {{event.player}}'s {{event.playCategory}} — serial #{{event.serial}}, from {{event.setName}}. The listing is still there. The Moment has not moved.",
+          "**Recent comparable sales in this serial band:**",
+          "{% for sale in event.recent_serial_band_sales %}",
+          "- Serial range {{sale.serial_range}} cleared **{{sale.amount}}** on {{sale.sold_at | date: \"%b %-d\"}}",
+          "{% endfor %}",
+          "A serial is a document. The collectors who carry the long memory of this platform are the ones who know that the comp band is the language a Moment speaks in. Your serial sits inside the band shown above. The market's most recent verdict on Moments like yours is on the page; the listing is open if you want it.",
+        ],
+        cta: "Finish your purchase",
+        voice_notes:
+          "Drops the cliché (\"the best NBA players know how to close out a game\") entirely. Replaces sports-metaphor pressure with comp-band evidence and a calm closing — \"the listing is open if you want it\" — which respects collector autonomy. The \"serial is a document\" framing is the Top Shot documentary frame applied directly. v1001 is similar in structure but tighter; v1002's closing paragraph leans into chronicler-statesman cadence (\"the comp band is the language a Moment speaks in\") which signals to the collector that they are being addressed as someone who knows what they are doing.",
+      },
+      cinematic: {
+        label: "Frame B — Cinematic · Abandoned Cart",
+        from: "NBA Top Shot <drops@nbatopshot.com>",
+        emailHero: {
+          src: "https://assets.nbatopshot.com/media/{{event.momentFlowID}}/image",
+          alt: "{{event.player}} {{event.playCategory}} Moment",
+          liquidCaption: "Dynamic Moment hero — full-bleed Moment image",
+        },
+        subject: "{{event.player}} #{{event.serial}}. Still open.",
+        preheader: "{{event.setName}} · {{event.tier}} tier · the listing hasn't moved.",
+        callouts: [
+          { label: "The Moment", value: "{{event.player}} — {{event.playCategory}}" },
+          { label: "Serial", value: "#{{event.serial}} of {{event.circulationCount}}" },
+          { label: "Status", value: "Listing intact" },
+        ],
+        body: [
+          "**The play already happened.**",
+          "Serial **#{{event.serial}}** is still on the marketplace. **One serial. One owner.** That's the deal.",
+          "{% for sale in event.recent_serial_band_sales %}Comparable serial {{sale.serial_range}} cleared **{{sale.amount}}** {{sale.sold_at | date: \"%b %-d\"}}. {% endfor %}",
+        ],
+        cta: "OWN THE MOMENT",
+        voice_notes:
+          "v1001 dropped the cliché and added structured comp-data block — chronicler factual register. v1002 keeps the comp data but recasts the whole email as a mythic ownership beat. \"One serial. One owner.\" is the cinematic distillation of the documentary frame. Same Liquid scaffolding as v1001 — fully compatible with `event.recent_serial_band_sales` engineering hook. Drops the urgency-pressure tone entirely.",
+      },
+      brief: {
+        label: "Frame C — Brief · Open Order",
+        from: "NBA Top Shot Marketplace <market@nbatopshot.com>",
+        emailHero: {
+          src: "https://assets.nbatopshot.com/media/{{event.momentFlowID}}/image",
+          alt: "{{event.player}} {{event.playCategory}} Moment thumbnail",
+          liquidCaption: "Dynamic Moment thumbnail; small inline, not full-bleed",
+        },
+        subject: "Open order: {{event.player}} #{{event.serial}} · listing intact.",
+        preheader: "Last comp in band: {{event.recent_serial_band_sales[0].amount}} on {{event.recent_serial_band_sales[0].sold_at | date: \"%b %-d\"}}.",
+        callouts: [
+          { label: "Moment", value: "{{event.player}} · {{event.playCategory}}" },
+          { label: "Set", value: "{{event.setName}} · {{event.tier}} · {{event.circulationCount}} mints" },
+          { label: "Serial", value: "#{{event.serial}}" },
+          { label: "Listing price", value: "{{event.listing_price}}" },
+          { label: "Band comp 1", value: "Serials {{event.recent_serial_band_sales[0].serial_range}} · {{event.recent_serial_band_sales[0].amount}} · {{event.recent_serial_band_sales[0].sold_at | date: \"%b %-d\"}}" },
+          { label: "Band comp 2", value: "Serials {{event.recent_serial_band_sales[1].serial_range}} · {{event.recent_serial_band_sales[1].amount}} · {{event.recent_serial_band_sales[1].sold_at | date: \"%b %-d\"}}" },
+        ],
+        body: [
+          "Order incomplete. Listing has not moved since you opened it. Two recent comps in your serial band above.",
+        ],
+        cta: "Finish your purchase",
+        voice_notes:
+          "v1001 swaps the cliché for chronicler-of-marketplace voice. Frame C strips it further to a position summary: listing state, two band comps, exit. Treats the open cart as an open order on a desk, not a missed shot.",
+      },
     },
     reviewer_ask:
       "Two: (a) `event.recent_serial_band_sales` — worth building (BQ → C.io derived event field), or strip the comp block for v1? (b) is dropping the urgency-pressure tone OK for cart recovery, or do we lose recovery rate by being calm?",
@@ -473,27 +981,108 @@ export const CARDS: UpgradeCard[] = [
       ],
     },
     after: {
-      label: "Proposed v1001 — Weekly Whale Read (one email/week to L4/L5)",
-      from: "Magic <magic@nbatopshot.com>",
-      subject: "What I'm watching this week — {{customer.userName}} read",
-      preheader: "Three patterns in your collection's neighborhood + one Moment to hold longer.",
-      callouts: [
-        { label: "Tier", value: "L4 — concierge weekly read" },
-        { label: "Your collection", value: "{{customer.lifetime_moments_owned}} Moments · {{customer.lifetime_value}} lifetime" },
-        { label: "Cadence", value: "Once weekly · never broadcast" },
-      ],
-      body: [
-        "Three things in the data this week that touch your collection. Not pitching — just what I'm watching.",
-        "**Pattern 1: {{whale.pattern_1.title}}** — {{whale.pattern_1.body}}.",
-        "**Pattern 2: {{whale.pattern_2.title}}** — {{whale.pattern_2.body}}.",
-        "**Pattern 3: {{whale.pattern_3.title}}** — {{whale.pattern_3.body}}.",
-        "**One Moment I'd hold longer:** {{whale.hold_recommendation.player}} — {{whale.hold_recommendation.set}}, serial #{{whale.hold_recommendation.serial}}. You bought it {{whale.hold_recommendation.bought_at | date: \"%b %Y\"}}. The market is starting to catch up to where you bought it.",
-        "Reply if you want a deeper read on any of these. Comp data on request.",
-        "— Magic",
-      ],
-      cta: "View comp data dashboard",
-      voice_notes:
-        "Magic-observational, NOT Magic-personal-letter. \"What I'm watching\" is a public observational frame, like a market read in a finance newsletter. Three patterns + one hold rec — structured, scannable, defensible. Reply-to-engage stays because this surface IS 1:1 by definition (L4/L5 only, weekly cadence). The 10-20% personal slot Roham reserved.",
+      v1001: {
+        label: "Proposed v1001 — Weekly Whale Read (one email/week to L4/L5)",
+        from: "Magic <magic@nbatopshot.com>",
+        emailHero: {
+          src: "https://userimg-assets.customeriomail.com/images/client-env-161112/1733248546287_01A-WIN-THE-ULTIMATE-FAN-EXPERIENCE_06_01JE6TKVN6TCK7F2VWH2RBAFBH.jpg",
+          alt: "NBA Top Shot — Ultimate fan experience",
+        },
+        subject: "What I'm watching this week — {{customer.userName}} read",
+        preheader: "Three patterns in your collection's neighborhood + one Moment to hold longer.",
+        callouts: [
+          { label: "Tier", value: "L4 — concierge weekly read" },
+          { label: "Your collection", value: "{{customer.lifetime_moments_owned}} Moments · {{customer.lifetime_value}} lifetime" },
+          { label: "Cadence", value: "Once weekly · never broadcast" },
+        ],
+        body: [
+          "Three things in the data this week that touch your collection. Not pitching — just what I'm watching.",
+          "**Pattern 1: {{whale.pattern_1.title}}** — {{whale.pattern_1.body}}.",
+          "**Pattern 2: {{whale.pattern_2.title}}** — {{whale.pattern_2.body}}.",
+          "**Pattern 3: {{whale.pattern_3.title}}** — {{whale.pattern_3.body}}.",
+          "**One Moment I'd hold longer:** {{whale.hold_recommendation.player}} — {{whale.hold_recommendation.set}}, serial #{{whale.hold_recommendation.serial}}. You bought it {{whale.hold_recommendation.bought_at | date: \"%b %Y\"}}. The market is starting to catch up to where you bought it.",
+          "Reply if you want a deeper read on any of these. Comp data on request.",
+          "— Magic",
+        ],
+        cta: "View comp data dashboard",
+        voice_notes:
+          "Magic-observational, NOT Magic-personal-letter. \"What I'm watching\" is a public observational frame, like a market read in a finance newsletter. Three patterns + one hold rec — structured, scannable, defensible. Reply-to-engage stays because this surface IS 1:1 by definition (L4/L5 only, weekly cadence). The 10-20% personal slot Roham reserved.",
+      },
+      almanac: {
+        label: "Frame A — Almanac · Weekly Whale Read (L4/L5, platform voice not personal)",
+        from: "NBA Top Shot <collector-desk@nbatopshot.com>",
+        emailHero: {
+          src: "https://userimg-assets.customeriomail.com/images/client-env-161112/1733248546287_01A-WIN-THE-ULTIMATE-FAN-EXPERIENCE_06_01JE6TKVN6TCK7F2VWH2RBAFBH.jpg",
+          alt: "NBA Top Shot collector desk",
+        },
+        subject: "This week's collector-desk read for {{customer.userName}}.",
+        preheader: "Three patterns in your collection's neighborhood. One Moment to hold longer.",
+        callouts: [
+          { label: "Tier", value: "L{{customer.lifetime_stage}} · weekly collector-desk read" },
+          { label: "Your collection", value: "{{customer.lifetime_moments_owned}} Moments · {{customer.lifetime_value}} lifetime" },
+          { label: "Cadence", value: "Once weekly · no broadcast" },
+          { label: "Author", value: "Top Shot collector desk · curated read" },
+        ],
+        body: [
+          "Three patterns in the data this week that touch your collection. Filed as observation, not pitch.",
+          "**Pattern 1 — {{whale.pattern_1.title}}.** {{whale.pattern_1.body}} The collectors most exposed to this pattern hold {{whale.pattern_1.player_concentration}}, which describes a {{whale.pattern_1.cohort_size}}-collector cohort that includes you.",
+          "**Pattern 2 — {{whale.pattern_2.title}}.** {{whale.pattern_2.body}} Recent comparable behavior in the band: {{whale.pattern_2.recent_comp}}.",
+          "**Pattern 3 — {{whale.pattern_3.title}}.** {{whale.pattern_3.body}} The market signal here is {{whale.pattern_3.market_signal}}.",
+          "**One Moment the collector desk would hold longer:** {{whale.hold_recommendation.player}} — {{whale.hold_recommendation.set}}, serial #{{whale.hold_recommendation.serial}}. You bought it {{whale.hold_recommendation.bought_at | date: \"%b %Y\"}} at {{whale.hold_recommendation.bought_price}}. The most recent comparable serial cleared at {{whale.hold_recommendation.recent_comp}}. The narrative density on this Moment is still building; the comp band has not yet caught up to where the cohort holds it.",
+          "The collector desk runs a weekly note for L{{customer.lifetime_stage}} collectors only. The full comp dashboard for your collection is one tap away.",
+        ],
+        cta: "View comp dashboard",
+        voice_notes:
+          "This is the most important Frame A correction against v1001. v1001's whale card was Magic-personal-letter (\"What I'm watching this week,\" signed \"— Magic\"), which is the voice trap Roham flagged. Frame A v1002 keeps the structure (three patterns + one hold rec) but reframes the sender as \"the collector desk\" — a platform surface, not a personal author. No \"I.\" No \"— Magic.\" No reply-to-engage. Statesman authority routed through an institutional voice, the way a research desk would address a portfolio manager. The 1:1 quality survives because the data is genuinely personalized; the personal-letter framing does not.",
+      },
+      cinematic: {
+        label: "Frame B — Cinematic · Whale Read",
+        from: "NBA Top Shot <drops@nbatopshot.com>",
+        emailHero: {
+          src: "https://userimg-assets.customeriomail.com/images/client-env-161112/1733248546287_01A-WIN-THE-ULTIMATE-FAN-EXPERIENCE_06_01JE6TKVN6TCK7F2VWH2RBAFBH.jpg",
+          alt: "NBA Top Shot — Ultimate fan experience",
+        },
+        subject: "The week, in three patterns.",
+        preheader: "{{customer.lifetime_moments_owned}} Moments. One hold rec inside.",
+        callouts: [
+          { label: "Tier", value: "L4 · concierge weekly read" },
+          { label: "Your collection", value: "{{customer.lifetime_moments_owned}} Moments · {{customer.lifetime_value}}" },
+          { label: "This week", value: "Round 2 · Cooper Flagg T-minus 14 days" },
+        ],
+        body: [
+          "**Three patterns. One hold.**",
+          "**{{whale.pattern_1.title}}** · **{{whale.pattern_2.title}}** · **{{whale.pattern_3.title}}**.",
+          "**Hold longer:** {{whale.hold_recommendation.player}} #{{whale.hold_recommendation.serial}}. Bought {{whale.hold_recommendation.bought_at | date: \"%b %Y\"}}. **The market is catching up.**",
+        ],
+        cta: "OPEN THE READ",
+        voice_notes:
+          "This is the deliberate departure from v1001. v1001 used the Magic-observational voice (10-20% personal slot) with \"What I'm watching this week\" framing and a \"— Magic\" sign-off. Frame B has NO sender persona by rule — so v1002 strips Magic entirely and recasts the whale read as a brand-cinematic dispatch (\"The week, in three patterns\"). Pattern titles become poster-headlines instead of explanatory body. The concierge weight comes from sparseness and structure, not from a personal letter. CTA points to a comp-data dashboard rather than reply-to-engage. Sentiment theme 1 (Cooper Flagg countdown) lands here as a status callout — the whale already knows; the email confirms position.",
+      },
+      brief: {
+        label: "Frame C — Brief · Weekly Whale Read",
+        from: "NBA Top Shot Brief <brief@nbatopshot.com>",
+        emailHero: {
+          src: "https://userimg-assets.customeriomail.com/images/client-env-161112/whale_chart_{{customer.id}}.png",
+          alt: "Portfolio sparkline + 3 pattern indicators",
+          liquidCaption: "Dynamic chart per L4/L5 wallet",
+        },
+        subject: "Weekly read: 3 patterns near your wallet, 1 hold flag.",
+        preheader: "{{customer.lifetime_value}} portfolio · {{customer.lifetime_moments_owned}} Moments · 7d action below.",
+        callouts: [
+          { label: "Portfolio", value: "{{customer.lifetime_moments_owned}} Moments · {{customer.lifetime_value}} lifetime" },
+          { label: "7d portfolio delta", value: "{{customer.portfolio_7d_change}} · {{customer.portfolio_positions_moved}} positions moved" },
+          { label: "Pattern 1", value: "{{whale.pattern_1.title}} · {{whale.pattern_1.metric}}" },
+          { label: "Pattern 2", value: "{{whale.pattern_2.title}} · {{whale.pattern_2.metric}}" },
+          { label: "Pattern 3", value: "{{whale.pattern_3.title}} · {{whale.pattern_3.metric}}" },
+          { label: "Hold flag", value: "{{whale.hold_recommendation.player}} #{{whale.hold_recommendation.serial}} · entry {{whale.hold_recommendation.bought_price}} · floor {{whale.hold_recommendation.floor_today}}" },
+        ],
+        body: [
+          "Three patterns intersect your top holdings this week. One position trending toward entry — flagged for review, not action. Reply for full comp pull.",
+        ],
+        cta: "Open comp dashboard",
+        voice_notes:
+          "v1001 uses Magic-observational (\"what I'm watching\") to occupy the 10-20% personal slot. Frame C closes that slot entirely — Bloomberg desk note, no signature, no \"I.\" Same wallet, same patterns, delivered as a position summary a CIO would forward without reading twice.",
+      },
     },
     reviewer_ask:
       "Three: (a) define L4/L5 — lifetime spend threshold, recency, both? (b) Magic curates the patterns and hold rec each week, or is it semi-automated from BQ signals? (c) does Matt want this surface to exist, or does it step on the Friday Lunch DM cadence he runs?",

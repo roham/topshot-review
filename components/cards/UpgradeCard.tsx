@@ -1,4 +1,27 @@
-import type { UpgradeCard as TUpgradeCard, UpgradeState, VoiceMode } from "@/lib/cards";
+import type { UpgradeCard as TUpgradeCard, UpgradeState, VoiceMode, AfterVariantId } from "@/lib/cards";
+
+const VARIANT_LABELS: Record<AfterVariantId, string> = {
+  v1001: "v1001",
+  almanac: "Almanac",
+  cinematic: "Cinematic",
+  brief: "Brief",
+};
+
+const VARIANT_DESCRIPTIONS: Record<AfterVariantId, string> = {
+  v1001: "Current · platform-chronicler",
+  almanac: "Frame A · Stratechery-style chronicler-statesman",
+  cinematic: "Frame B · Topps-style sensationalized legend",
+  brief: "Frame C · Bloomberg-style market reporter",
+};
+
+const VARIANT_TONES: Record<AfterVariantId, string> = {
+  v1001: "border-mint-500/40 bg-mint-500/15 text-mint-200",
+  almanac: "border-flame-500/40 bg-flame-500/15 text-flame-200",
+  cinematic: "border-rose-500/40 bg-rose-500/15 text-rose-200",
+  brief: "border-amber-500/40 bg-amber-500/15 text-amber-200",
+};
+
+const VARIANT_ORDER: AfterVariantId[] = ["v1001", "almanac", "cinematic", "brief"];
 
 const STATE_LABEL: Record<UpgradeState, string> = {
   "stopped": "STOPPED",
@@ -46,7 +69,16 @@ function MdLine({ text }: { text: string }) {
   );
 }
 
-export function UpgradeCard({ card }: { card: TUpgradeCard }) {
+export function UpgradeCard({
+  card,
+  activeVariant,
+  onVariantChange,
+}: {
+  card: TUpgradeCard;
+  activeVariant: AfterVariantId;
+  onVariantChange: (v: AfterVariantId) => void;
+}) {
+  const after = card.after[activeVariant];
   return (
     <article className="w-full max-w-[640px] mx-auto bg-ink-900/95 border border-white/10 rounded-3xl shadow-card overflow-hidden">
       {/* Hero */}
@@ -192,13 +224,32 @@ export function UpgradeCard({ card }: { card: TUpgradeCard }) {
       )}
 
       {/* After */}
-      <Section title="Proposed v1001 — upgrade" tone="after">
-        <div className="flex items-center justify-between gap-3 flex-wrap">
+      <Section title="Proposed upgrade — 4 variants to compare" tone="after">
+        {/* Variant tab strip */}
+        <div className="mb-3 -mx-1 flex flex-wrap gap-1.5">
+          {VARIANT_ORDER.map((v) => {
+            const isActive = v === activeVariant;
+            return (
+              <button
+                key={v}
+                onClick={() => onVariantChange(v)}
+                className={`px-2.5 py-1.5 rounded-lg border text-[11px] font-semibold uppercase tracking-wider transition ${
+                  isActive
+                    ? VARIANT_TONES[v]
+                    : "border-white/10 bg-white/[0.02] text-ink-400 hover:bg-white/[0.05]"
+                }`}
+              >
+                {VARIANT_LABELS[v]}
+              </button>
+            );
+          })}
+        </div>
+        <div className="flex items-center justify-between gap-3 flex-wrap mb-2">
           <div className="text-[10.5px] uppercase tracking-wider text-ink-400 font-semibold">
-            {card.after.label}
+            {after.label}
           </div>
-          <span className="text-[10px] uppercase tracking-[0.16em] px-2 py-0.5 rounded-full border border-mint-500/30 bg-mint-500/10 text-mint-300 font-semibold">
-            Voice · {VOICE_LABEL[card.voice]}
+          <span className="text-[10px] uppercase tracking-[0.16em] text-ink-400 font-semibold">
+            {VARIANT_DESCRIPTIONS[activeVariant]}
           </span>
         </div>
         <div className="mt-2 rounded-xl border border-mint-500/20 bg-mint-500/[0.04] overflow-hidden">
@@ -206,11 +257,11 @@ export function UpgradeCard({ card }: { card: TUpgradeCard }) {
           <div className="px-3 py-2 border-b border-mint-500/15 bg-mint-500/[0.03]">
             <div className="flex items-center gap-2">
               <div className="h-7 w-7 rounded-full bg-gradient-to-br from-flame-400 to-flame-600 grid place-items-center text-white text-[10.5px] font-bold flex-shrink-0">
-                {card.after.from.startsWith("Magic") ? "M" : "TS"}
+                {after.from.startsWith("Magic") ? "M" : "TS"}
               </div>
               <div className="min-w-0 flex-1">
                 <div className="text-[12px] text-ink-100 font-semibold truncate">
-                  {card.after.from}
+                  {after.from}
                 </div>
                 <div className="text-[10.5px] text-ink-400">
                   to {`{{customer.userName}}`}
@@ -221,20 +272,45 @@ export function UpgradeCard({ card }: { card: TUpgradeCard }) {
           {/* Subject + preheader */}
           <div className="px-3 pt-3">
             <div className="text-[15px] text-ink-50 font-semibold leading-snug text-balance">
-              {card.after.subject}
+              {after.subject}
             </div>
             <div className="mt-1 text-[12px] text-ink-400 italic leading-snug">
-              {card.after.preheader}
+              {after.preheader}
             </div>
           </div>
-          {/* Hero placeholder strip — image-led signal */}
-          <div className="mx-3 mt-3 rounded-lg border border-white/10 bg-gradient-to-br from-ink-800 to-ink-900 px-3 py-3 text-[10.5px] uppercase tracking-wider text-ink-500 font-semibold text-center">
-            ▢ Hero image · branded · 60%+ visual real estate
+          {/* Email brand header */}
+          <div className="mx-3 mt-3 rounded-t-lg bg-black px-4 py-3 flex items-center justify-center border border-white/10">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://userimg-assets.customeriomail.com/images/client-env-161112/1717540209144_NBATopShot_LOGO_Horizontal_WhiteText_01HZJNZGHEK03E5E2ZH1DBRQ8E.png"
+              alt="NBA Top Shot"
+              className="h-7 w-auto"
+            />
           </div>
+          {/* Hero image — real official asset */}
+          {after.emailHero ? (
+            <div className="mx-3 overflow-hidden border-x border-white/10">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={after.emailHero.src}
+                alt={after.emailHero.alt}
+                className="w-full block"
+              />
+              {after.emailHero.liquidCaption && (
+                <div className="px-3 py-1.5 bg-flame-500/10 border-t border-flame-500/20 text-[10px] font-mono text-flame-300 text-center">
+                  {after.emailHero.liquidCaption}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="mx-3 border-x border-white/10 bg-gradient-to-br from-ink-800 to-ink-900 px-3 py-3 text-[10.5px] uppercase tracking-wider text-ink-500 font-semibold text-center">
+              ▢ Hero image · branded · 60%+ visual real estate
+            </div>
+          )}
           {/* Structured callouts */}
-          {card.after.callouts && card.after.callouts.length > 0 && (
+          {after.callouts && after.callouts.length > 0 && (
             <div className="mx-3 mt-3 rounded-lg border border-flame-500/20 bg-flame-500/[0.04] divide-y divide-flame-500/15 overflow-hidden">
-              {card.after.callouts.map((c, i) => (
+              {after.callouts.map((c, i) => (
                 <div
                   key={i}
                   className="grid grid-cols-[minmax(96px,30%)_1fr] text-[12px]"
@@ -251,7 +327,7 @@ export function UpgradeCard({ card }: { card: TUpgradeCard }) {
           )}
           {/* Body */}
           <div className="px-3 pt-3 pb-3 space-y-2.5 text-[13.5px] text-ink-100 leading-[1.55]">
-            {card.after.body.map((p, i) => {
+            {after.body.map((p, i) => {
               if (/^\{%/.test(p.trim()) || /^\{\{/.test(p.trim())) {
                 return (
                   <p key={i} className="font-mono text-[12px] text-flame-300">
@@ -267,18 +343,45 @@ export function UpgradeCard({ card }: { card: TUpgradeCard }) {
             })}
           </div>
           {/* CTA */}
-          <div className="mx-3 mb-3 mt-1">
-            <div className="rounded-lg bg-flame-500 px-4 py-2.5 text-center text-[13px] font-semibold text-white">
-              {card.after.cta} →
+          <div className="mx-3 mt-1">
+            <div className="rounded-lg bg-[#E9461B] px-4 py-3 text-center text-[14px] font-bold text-white tracking-wide shadow-lg shadow-flame-500/25 hover:bg-[#d43d15] cursor-pointer">
+              {after.cta} →
+            </div>
+          </div>
+          {/* Email footer */}
+          <div className="mx-3 mb-3 mt-4 rounded-b-lg border border-white/10 bg-black/60 px-4 py-3 flex flex-col items-center gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://userimg-assets.customeriomail.com/images/client-env-161112/1717540209144_NBATopShot_LOGO_Horizontal_WhiteText_01HZJNZGHEK03E5E2ZH1DBRQ8E.png"
+              alt="NBA Top Shot"
+              className="h-5 w-auto opacity-60"
+            />
+            <div className="flex items-center gap-2.5">
+              {[
+                { label: "Discord", icon: "https://app-rsrc.getbee.io/public/resources/social-networks-icon-sets/circle-black/discord@2x.png" },
+                { label: "X", icon: "https://app-rsrc.getbee.io/public/resources/social-networks-icon-sets/circle-black/twitter@2x.png" },
+                { label: "Instagram", icon: "https://app-rsrc.getbee.io/public/resources/social-networks-icon-sets/circle-black/instagram@2x.png" },
+                { label: "YouTube", icon: "https://app-rsrc.getbee.io/public/resources/social-networks-icon-sets/circle-black/youtube@2x.png" },
+              ].map((s) => (
+                <div key={s.label} className="h-6 w-6 rounded-full overflow-hidden opacity-40">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={s.icon} alt={s.label} className="h-full w-full" />
+                </div>
+              ))}
+            </div>
+            <div className="text-[9.5px] text-ink-500 text-center leading-snug">
+              Dapper Labs Inc · 222 N Pacific Coast Hwy, El Segundo, CA 90245
+              <br />
+              <span className="text-ink-600">Privacy Policy · Terms of Service · Unsubscribe</span>
             </div>
           </div>
         </div>
-        {card.after.voice_notes && (
+        {after.voice_notes && (
           <p className="mt-3 text-[12.5px] text-ink-300 leading-relaxed italic text-pretty">
             <span className="text-mint-400 not-italic font-semibold">
               Voice notes:{" "}
             </span>
-            {card.after.voice_notes}
+            {after.voice_notes}
           </p>
         )}
       </Section>
