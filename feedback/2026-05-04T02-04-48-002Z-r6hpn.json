@@ -1,0 +1,8 @@
+{
+  "piece_id": "drop-announcement-programmatic",
+  "vote": "needs-work",
+  "note": "First of all, we can't just reuse the exact same template table in every single email. I think we need to have a design system of different kinds of emails and tables and things frames and stuff like that, based on the topic of what we're talking about and all the different types of emails that we're going to send. They need to sort of sing together but also be individually unique, so it's not like we're sending the exact same emails all the time.\n\nAlso, tables in general, I think, are dangerous, because using them too much makes the whole thing look like a spreadsheet. There's got to be more interesting visual ways to get across many things, especially exciting things. Do you know what I mean?",
+  "reasons": [],
+  "voter": "ro",
+  "ts": "2026-05-04T02:04:48.002Z"
+}
