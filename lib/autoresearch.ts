@@ -211,8 +211,30 @@ export function entryToCard(entry: LeaderboardEntry, position: number): Card {
   // autoresearch defaults so the card's static text fields don't show
   // raw `{{var}}`. The detailed in-email body still goes through full
   // per-trigger Liquid resolution at render time.
-  const resolvedSubject = resolveLiquidString(draft.subject, AUTORESEARCH_DEFAULTS as Record<string, unknown>);
-  const resolvedPreheader = resolveLiquidString(draft.preheader, AUTORESEARCH_DEFAULTS as Record<string, unknown>);
+  // Custom resolve: substitute known vars with their values; unknown vars
+  // become humanized placeholders ("[set name]") so reviewers see WHAT goes
+  // there at send time, instead of a confusing empty gap.
+  const resolveOrPlaceholder = (s: string | undefined): string => {
+    if (!s) return "";
+    return s.replace(/\{\{\s*([^}]+?)\s*\}\}/g, (_match, expr: string) => {
+      const path = String(expr).split("|")[0].trim();
+      const segments = path.split(".");
+      let cur: unknown = AUTORESEARCH_DEFAULTS;
+      for (const seg of segments) {
+        if (cur && typeof cur === "object" && seg in (cur as Record<string, unknown>)) {
+          cur = (cur as Record<string, unknown>)[seg];
+        } else {
+          cur = undefined;
+          break;
+        }
+      }
+      if (cur != null && cur !== "" && typeof cur !== "object") return String(cur);
+      const clean = path.replace(/^[a-z]+\./i, "").replace(/_/g, " ");
+      return `[${clean}]`;
+    });
+  };
+  const resolvedSubject = resolveOrPlaceholder(draft.subject);
+  const resolvedPreheader = resolveOrPlaceholder(draft.preheader);
 
   const after: AfterBlock = {
     label: `${triggerLabel} · ${draft.voice_mode ?? "draft"}`,
