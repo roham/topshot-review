@@ -432,9 +432,9 @@ export function loadAutoresearchCards(opts: LoadOptions = {}): {
   );
 
   // Reject drafts where the rendered output would have too many unresolved
-  // Liquid placeholders. After resolveOrPlaceholder runs, [bracket] tokens
-  // signal vars our mock data doesn't cover. >2 brackets in a draft body =
-  // not review-ready (looks broken to colleagues, not designed).
+  // resolveOrPlaceholder already converts unknown vars to readable [bracket text],
+  // so raw {{vars}} never leak to reviewers. Only block cards where ALL (or nearly
+  // all) vars are unknown — those give no real signal because nothing resolves.
   const placeholderDensityOK = (e: LeaderboardEntry): boolean => {
     const subject = e.draft?.subject ?? "";
     const html = e.draft?.body_html ?? "";
@@ -442,6 +442,7 @@ export function loadAutoresearchCards(opts: LoadOptions = {}): {
       ...((subject.match(/\{\{[^}]+\}\}/g) ?? []) as string[]),
       ...((html.match(/\{\{[^}]+\}\}/g) ?? []) as string[]),
     ];
+    if (tokens.length === 0) return true;
     const knownTokens = tokens.filter((t) => {
       const path = t.replace(/[{}|\s]/g, "").split("|")[0];
       const segments = path.split(".");
@@ -455,11 +456,8 @@ export function loadAutoresearchCards(opts: LoadOptions = {}): {
       }
       return cur != null && cur !== "";
     });
-    const unknown = tokens.length - knownTokens.length;
-    // Allow at most 2 unknowns and at most 30% unknown ratio.
-    if (unknown <= 2) return true;
-    if (tokens.length === 0) return true;
-    return unknown / tokens.length <= 0.3;
+    // Block only if >80% unresolvable (the card has virtually no mock data to show).
+    return knownTokens.length / tokens.length >= 0.2;
   };
   filtered = filtered.filter(placeholderDensityOK);
 
