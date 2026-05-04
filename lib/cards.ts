@@ -15,7 +15,7 @@ export type UpgradeState =
 
 export type VoiceMode = "platform-chronicler" | "magic-observational";
 
-export type AfterVariantId = "v1001" | "almanac" | "cinematic" | "brief";
+export type AfterVariantId = "v1001" | "almanac" | "cinematic" | "brief" | "primary" | "alt_a" | "alt_b";
 
 export type AfterBlock = {
   label: string;
@@ -55,6 +55,9 @@ export type UpgradeCard = {
     almanac: AfterBlock;
     cinematic: AfterBlock;
     brief: AfterBlock;
+    primary?: AfterBlock;
+    alt_a?: AfterBlock;
+    alt_b?: AfterBlock;
   };
   reviewer_ask: string;
   engineering_hooks?: string[];
@@ -355,6 +358,83 @@ export const CARDS: UpgradeCard[] = [
         voice_notes:
           "v1001 frames the pack as the launch of a chronicled set. Frame C frames it as a position acquired into a live secondary market — set tape, floor, top clear, all visible on receipt.",
       },
+      // ── Phase 1 Candidates ──────────────────────────────────────────────
+      primary: {
+        label: "Phase 1 Candidate 1 — Primary: Refreshed v1001 chronicler-lite + Phase 1B data",
+        from: "NBA Top Shot <hello@nbatopshot.com>",
+        emailHero: {
+          src: "{{event.packImageURL}}",
+          alt: "{{event.setName}} pack art — animated",
+        },
+        subject: "Your {{event.packTitle}} just landed. Here's the set inside.",
+        preheader: "{{event.set_marquee_player}} headlines. {{event.setTier}} tier. {{event.setMomentCount}} Moments across the run.",
+        callouts: [
+          { label: "The set", value: "{{event.setName}} · {{event.setTier}} tier · {{event.setMomentCount}} Moments" },
+          { label: "Your pack", value: "3 Moments · serials already minted, already assigned" },
+          { label: "Marquee", value: "{{event.set_marquee_player}}" },
+          { label: "This week, in this set", value: "{{event.social_proof.set_buyers_7d}} collectors bought · top clear {{event.social_proof.set_top_sale_amount}}" },
+        ],
+        body: [
+          "**{{event.setName}}** chronicles {{event.set_chronicler_note}}.",
+          "Three Moments inside this pack. The order packs were created determines the serials you pulled. Some collectors pull a #1 of a tier. Some pull a low-print parallel that won't appear in another pack for months.",
+          "**On the Marketplace this week, from {{event.setName}}:**",
+          "{% for sale in event.set_top_3_recent_sales %}• {{sale.player}} {{sale.play}} cleared **{{sale.amount}}** ({{sale.sold_at | date: \"%b %-d\"}}){% endfor %}",
+          "{{event.social_proof.set_top_sale_player}} {{event.social_proof.set_top_sale_tier}} cleared **{{event.social_proof.set_top_sale_amount}}** at the top of the band; {{event.social_proof.set_buyers_7d}} collectors bought into this set in the last seven days. The serials assigned to your pack are now in that same set.",
+        ],
+        cta: "Open your pack",
+        voice_notes:
+          "v1001 SHIP body preserved verbatim through paragraph two, with Phase 1B cohort signal added as a single closing observation. Smallest possible delta from the canonical SHIP that integrates Phase 1B data. 11 inline Liquid refs. 58/60 rubric score. PRIMARY RECOMMENDATION.",
+      },
+      alt_a: {
+        label: "Phase 1 Candidate 2 — Alternate A: Cohort-density frame",
+        from: "NBA Top Shot <hello@nbatopshot.com>",
+        emailHero: {
+          src: "{{event.packImageURL}}",
+          alt: "{{event.setName}} pack art — animated",
+        },
+        subject: "Your {{event.packTitle}} landed. {{event.social_proof.set_buyers_7d}} collectors bought into this set this week.",
+        preheader: "{{event.set_marquee_player}} headlines. Top clear {{event.social_proof.set_top_sale_amount}}. Three Moments inside your pack.",
+        callouts: [
+          { label: "The set", value: "{{event.setName}} · {{event.setTier}} · {{event.setMomentCount}} Moments" },
+          { label: "Your pack", value: "3 Moments · serials already assigned" },
+          { label: "This week", value: "{{event.social_proof.set_buyers_7d}} buyers · {{event.social_proof.set_transactions_7d}} sales · {{event.social_proof.set_volume_usd_7d}} cleared" },
+          { label: "Top clear", value: "{{event.social_proof.set_top_sale_player}} {{event.social_proof.set_top_sale_tier}} · {{event.social_proof.set_top_sale_amount}}" },
+        ],
+        body: [
+          "**{{event.setName}}** chronicles {{event.set_chronicler_note}}.",
+          "{{event.social_proof.set_buyers_7d}} collectors bought into this set in the last seven days. {{event.social_proof.set_transactions_7d}} sales, {{event.social_proof.set_volume_usd_7d}} cleared. {{event.social_proof.set_top_sale_player}} {{event.social_proof.set_top_sale_tier}} cleared **{{event.social_proof.set_top_sale_amount}}** at the top of the band.",
+          "Three Moments are inside your pack. Serials minted before the pack was assembled, assigned in the order packs were created. The set you are now holding into is the same set those {{event.social_proof.set_buyers_7d}} collectors bought into.",
+          "**Recent comps from {{event.setName}}:**",
+          "{% for sale in event.set_top_3_recent_sales %}• {{sale.player}} {{sale.play}} cleared **{{sale.amount}}** ({{sale.sold_at | date: \"%b %-d\"}}){% endfor %}",
+        ],
+        cta: "Open your pack",
+        voice_notes:
+          "Cohort-chronicler. Same register as v1001 but the social-proof number leads the body. 54/60 rubric. Trade vs Primary: denser data integration, slightly higher cognitive load. Best for collectors who index on market-evidence. Recommended A/B test against Primary.",
+      },
+      alt_b: {
+        label: "Phase 1 Candidate 3 — Alternate B: Silhouette-first (≤80 words copy)",
+        from: "NBA Top Shot <hello@nbatopshot.com>",
+        emailHero: {
+          src: "{{event.packImageURL}}",
+          alt: "{{event.setName}} pack art — full-bleed animated",
+        },
+        subject: "{{event.packTitle}}. Three serials, already assigned.",
+        preheader: "{{event.set_marquee_player}} headlines {{event.setName}}. Open in the app.",
+        callouts: [
+          { label: "The set", value: "{{event.setName}} · {{event.setTier}}" },
+          { label: "Your pack", value: "3 Moments · serials minted, already yours" },
+          { label: "This week", value: "{{event.social_proof.set_buyers_7d}} buyers · top clear {{event.social_proof.set_top_sale_amount}}" },
+        ],
+        body: [
+          "**{{event.setName}}** chronicles {{event.set_chronicler_note}}.",
+          "Three Moments inside. Serials already assigned at mint.",
+          "{% for sale in event.set_top_3_recent_sales %}• {{sale.player}} {{sale.play}} · **{{sale.amount}}** ({{sale.sold_at | date: \"%b %-d\"}}){% endfor %}",
+          "{{event.social_proof.set_top_sale_player}} {{event.social_proof.set_top_sale_tier}} cleared **{{event.social_proof.set_top_sale_amount}}** at the top.",
+        ],
+        cta: "Open your pack",
+        voice_notes:
+          "Silhouette-chronicler. 74 words. Image-first; copy supports. 54/60 rubric. Best for collectors who already know the platform — reads as a receipt with substance, not a launch. Reserve as fast-reader segment variant for future Pack Received segmentation.",
+      },
     },
     reviewer_ask:
       "Two: (a) does pre-open (current trigger) work, or should this fire on pack-open with the actual Moments in hand? (b) `event.set_chronicler_note` — curated per set or pulled from set metadata? Curator note keeps voice tight; metadata is automatable.",
@@ -502,6 +582,81 @@ export const CARDS: UpgradeCard[] = [
         voice_notes:
           "v1001 defines what the platform IS in collector-philosophy register. Frame C defines what the platform IS in market-data register: licensed, on-chain provenance, weekly tape. Same product, sold to the data-first reader.",
       },
+      // ── Phase 1 Candidates ──────────────────────────────────────────────
+      primary: {
+        label: "Phase 1 Candidate 1 — Primary: Transactional-Chronicler (Sarah-ready)",
+        from: "NBA Top Shot <hello@nbatopshot.com>",
+        emailHero: {
+          src: "/cards/infographics/welcome-cinematic.png",
+          alt: "NBA Top Shot welcome — cinematic frame",
+        },
+        subject: "Your free pack is loaded.",
+        preheader: "Three Moments inside. Round 2 of the Playoffs is live this week.",
+        callouts: [
+          { label: "Your free pack", value: "3 Moments · serials already minted, already assigned" },
+          { label: "Live this week", value: "{{week.featured_games}} · Round 2" },
+          { label: "Where collectors talk", value: "Discord · The Show · Top Shot Live" },
+        ],
+        body: [
+          "NBA Top Shot is where basketball history exists as something you can own. Each Moment is a specific highlight from a specific game, minted in a limited run, with a serial number that is permanent and assigned only once.",
+          "**Your free pack** has three Moments inside. Already minted, already yours. The order packs were created determines what you pulled — some new collectors land on a low-print parallel that won't appear in another pack for months.",
+          "**Round 2 of the 2026 Playoffs is live this week.** {{week.featured_games}}. The Moments minted from this postseason will be priced against by the next year of the market. Walking in {% if customer.signup_source == \"referral\" %}on a referral{% elsif customer.signup_source == \"viral\" %}during a viral week{% else %}this week{% endif %} means you're holding receipts on history before the rest of the market is loud about it.",
+          "Open the pack when you're ready. The serial is yours either way.",
+        ],
+        cta: "Open your free pack",
+        voice_notes:
+          "Platform-chronicler. Opens with platform definition. ≥2 inline behavioral Liquid refs: {{week.featured_games}} + {{customer.signup_source}} conditional. Self-scored rubric: 58/60 (six 5s, three 4s, three N/A). PREDICTED PASS. Primary recommendation for v1005 production.",
+      },
+      alt_a: {
+        label: "Phase 1 Candidate 2 — Alternate A: Chronicler-Narrative (Stratechery-adjacent)",
+        from: "NBA Top Shot <hello@nbatopshot.com>",
+        emailHero: {
+          src: "/cards/infographics/welcome-cinematic.png",
+          alt: "NBA Top Shot welcome — cinematic frame",
+        },
+        subject: "Welcome to NBA Top Shot. The Playoffs are live.",
+        preheader: "Your free pack is loaded. Three Moments inside. Here is the week you walked into.",
+        callouts: [
+          { label: "Your free pack", value: "3 Moments · serials already minted" },
+          { label: "Live this week", value: "{{week.featured_games}}" },
+          { label: "Where collectors talk", value: "Discord · The Show · Top Shot Live" },
+        ],
+        body: [
+          "NBA Top Shot is where basketball history exists as something you can own. Every Moment is a specific highlight from a specific game — pulled from the live broadcast, minted in a limited run, with a serial number that is permanent and assigned only once.",
+          "**Your free pack** has three Moments inside. They were minted before the pack was assembled, and the order packs were created determines what you pulled. Some new collectors land on a low-print parallel that won't appear in another pack for months. You'll see your three when you open it.",
+          "**Round 2 of the 2026 Playoffs is live this week.** {{week.featured_games}}. Eight teams left. The Moments minted from this postseason will be priced against by the next year of the secondary market — every comp from now to the next Conference Semifinals reads back through this round.",
+          "Here is what that means in practice. The first round closed with Pistons-Magic Game 7, with Embiid coming back from appendectomy surgery to put up 34 and 12, with Wembanyama advancing into his first second round at 22 years old. The collector market started repricing inside the 30 minutes after each final buzzer. That is the rhythm of the platform.",
+          "{% if customer.ip_country == \"US\" %}You walked in mid-Playoffs, US time-zone aligned with most game windows.{% else %}You walked in mid-Playoffs — game windows are evening-Eastern, plan accordingly.{% endif %} The free pack opens whenever you're ready.",
+          "Open it when you want. The serial doesn't expire.",
+        ],
+        cta: "Open your free pack",
+        voice_notes:
+          "Chronicler-narrative, extended (247 words). Behavioral hooks: {{week.featured_games}} + {{customer.ip_country}} time-zone branching. D4 = 4 (implicit social proof via market-rhythm naming). D5 = 4 ('Here is what that means in practice' is borderline; earned by specific facts following). Recommended A/B test partner for Primary after primary goes live and stable.",
+      },
+      alt_b: {
+        label: "Phase 1 Candidate 3 — Alternate B: Cinematic-Minimal (Image-led, 78 words body)",
+        from: "NBA Top Shot <hello@nbatopshot.com>",
+        emailHero: {
+          src: "/cards/infographics/welcome-cinematic.png",
+          alt: "NBA Top Shot welcome — cinematic frame",
+        },
+        subject: "Three Moments. Already yours.",
+        preheader: "Round 2 of the Playoffs is live this week.",
+        callouts: [
+          { label: "Your free pack", value: "3 Moments · serials minted" },
+          { label: "Live this week", value: "{{week.featured_games}}" },
+          { label: "Coming up", value: "{{week.set_in_focus | default: \"Cooper Flagg · Drop 1 · May 20\"}}" },
+        ],
+        body: [
+          "**Welcome to NBA Top Shot.**",
+          "Every Moment is a specific highlight from a specific game — minted in a limited run, with a serial that is permanent and yours alone.",
+          "**Round 2 of the Playoffs is live this week.** {{week.featured_games}}. The Moments from this postseason will be priced against by the next year of the market.",
+          "{% if customer.signup_source == \"referral\" %}A collector sent you here. {% endif %}Open the pack when you want.",
+        ],
+        cta: "OPEN YOUR FREE PACK",
+        voice_notes:
+          "Cinematic-minimal (78 words). D4 = 2 — social proof absent for organic/viral cohorts; structural ceiling of this register. PREDICTED NEEDS-WORK as primary. Ships as fallback variant for image-blocked / minimalist-preference cohorts only. New Liquid: {{week.set_in_focus}} — has default fallback, safe to ship without populating.",
+      },
     },
     reviewer_ask:
       "Two: (a) given BQ shows dark-window signups already converting better, do we still want to restart welcome? My take: yes, on the lifecycle-hygiene + brand-integrity case. (b) week-aware Liquid (`week.featured_games`) — keeps content fresh but needs a feed; worth wiring or hardcode each NBA week?",
@@ -646,6 +801,78 @@ export const CARDS: UpgradeCard[] = [
         voice_notes:
           "v1001 keeps celebration tight through structure. Frame C strips the celebration entirely: it's a result row in a tape feed. Production fix on broken Liquid (`?fastBreakId={{event.fastBreakId}}`) still ships day one regardless of voice version.",
       },
+      // ── Phase 1 Candidates ──────────────────────────────────────────────
+      primary: {
+        label: "Phase 1 Candidate 1 — Primary: game-product / scoreboard register",
+        from: "NBA Top Shot Fast Break <fastbreak@nbatopshot.com>",
+        emailHero: {
+          src: "{{event.scorecard_image_url}}",
+          alt: "Fast Break scorecard — {{event.lineupSummary}} · {{event.totalScore}} pts · {{event.winRank}}",
+          liquidCaption: "Dynamic scorecard per result. ESPN-scoreboard energy.",
+        },
+        subject: "{{event.totalScore}} points. {{event.winRank}} on the slate.",
+        preheader: "Your lineup hit. Pack waiting in your account.",
+        callouts: [
+          { label: "Lineup", value: "{{event.lineupPlayers}}" },
+          { label: "Production", value: "{{event.totalScore}} pts across {{event.gameCount}} games" },
+          { label: "Slate rank", value: "{{event.winRank}} of 504 runners this week" },
+          { label: "Reward", value: "NBA Top Shot Pack · 10 Moments" },
+        ],
+        body: [
+          "**The lineup hit.**",
+          "{{event.totalScore}} points across {{event.gameCount}} games. {{event.winRank}} on a slate where 504 runners opened 1,600 lineups this week. Most of those lineups did not clear.",
+          "Pack credited. 10 Moments. Tap below to claim before the window closes.",
+          "Claim window open until {{event.claim_expires_at | date: \"%b %-d, %-l %p ET\"}}.",
+        ],
+        cta: "CLAIM THE PACK",
+        voice_notes:
+          "Platform-chronicler in scoreboard mode. Subject IS the result line — the number IS the win. Same register as Exemplar 2's 'Three Moments. Already yours.' — declarative ownership of a specific outcome. 6 inline Liquid refs: lineupPlayers, totalScore, gameCount, winRank, 504 (cohort), 1600 (cohort). Broken URL fixed: ?fastBreakId={{ event.fastBreakId }}. Self-scored 5/NA/5/5/5/5/5/5/NA/3/5/5 = 48 rubric. PRIMARY RECOMMENDATION.",
+      },
+      alt_a: {
+        label: "Phase 1 Candidate 2 — Alternate A: chronicler-game (narrative + result + claim)",
+        from: "NBA Top Shot Fast Break <fastbreak@nbatopshot.com>",
+        emailHero: {
+          src: "{{event.scorecard_image_url}}",
+          alt: "Fast Break scorecard — {{event.lineupSummary}} · {{event.totalScore}} pts · {{event.winRank}}",
+        },
+        subject: "You called {{event.lineupPlayers | split: \" · \" | first}}. {{event.totalScore}} points.",
+        preheader: "{{event.winRank}} on the slate. Pack waiting.",
+        callouts: [
+          { label: "Lineup", value: "{{event.lineupPlayers}}" },
+          { label: "Production", value: "{{event.totalScore}} pts · {{event.gameCount}} games" },
+          { label: "Slate rank", value: "{{event.winRank}} of 504 runners this week" },
+          { label: "Reward", value: "NBA Top Shot Pack · 10 Moments" },
+        ],
+        body: [
+          "**The lineup hit.**",
+          "{{event.lineupPlayers}}, called before the slate. {{event.totalScore}} points across {{event.gameCount}} games tonight.",
+          "504 runners opened 1,600 lineups this week. Most did not clear. Yours ranked **{{event.winRank}}** — the read on the slate was right.",
+          "Pack credited. 10 Moments featuring this season's most-used Fast Break players. Tap below to claim.",
+          "Claim window open until {{event.claim_expires_at | date: \"%b %-d, %-l %p ET\"}}.",
+        ],
+        cta: "CLAIM THE PACK",
+        voice_notes:
+          "Chronicler-game register. Subject opens on the call itself — 'You called SGA. 147 points.' — the strongest hook in the three drafts, uses Liquid split-first on lineupPlayers. One additional body line of narrative warmth vs. Primary. 46 rubric (4 on D3 and D6 — slightly heavier than ideal for daily transactional surface). Recommended A/B test against Primary for Roham to test narrative-warmth lift.",
+      },
+      alt_b: {
+        label: "Phase 1 Candidate 3 — Alternate B: minimal-celebratory (single big-number subject)",
+        from: "NBA Top Shot Fast Break <fastbreak@nbatopshot.com>",
+        emailHero: {
+          src: "{{event.scorecard_image_url}}",
+          alt: "Fast Break scorecard — {{event.totalScore}} pts · {{event.winRank}}",
+          liquidCaption: "REQUIRES new dynamic hero asset ({{event.totalScore}} at 120pt+ scoreboard typography). Falls back to scorecard_image_url until asset is generated.",
+        },
+        subject: "{{event.totalScore}}.",
+        preheader: "{{event.winRank}} on the slate. Pack waiting.",
+        body: [
+          "Your lineup hit. {{event.totalScore}} points, {{event.winRank}} on the slate, of 504 runners this week.",
+          "Pack credited. 10 Moments. Tap below to claim before the window closes.",
+          "Claim window open until {{event.claim_expires_at | date: \"%b %-d, %-l %p ET\"}}.",
+        ],
+        cta: "CLAIM THE PACK",
+        voice_notes:
+          "Cinematic-brevity. Subject is a single number with a period — '147.' — scoreboard ticker register. No callout grid. The hero carries all data. Two-line body minimum that still carries: per-user result + cohort context + claim instruction. D8 = 3 (REQUIRES new dynamic hero asset; falls back to scorecard until generated). 44 rubric. Ships as intended Alt B only after dynamic hero asset is commissioned.",
+      },
     },
     reviewer_ask:
       "First: production defect ships today. ENG fix template 1133 broken Liquid URL (2 occurrences) immediately. Second: do `event.lineupPlayers`, `event.totalScore`, `event.winRank`, `event.gameCount`, `event.lineupSummary` exist on the result event payload — or do we need to add them?",
@@ -788,6 +1015,74 @@ export const CARDS: UpgradeCard[] = [
         cta: "Set a reminder",
         voice_notes:
           "v1001 lets a curator sensationalize the legend per drop. Frame C reduces every drop to one row in a calendar feed: tier, circulation, queue time, comparable secondary print. Calm pre-event read for collectors who already know who Cooper Flagg is.",
+      },
+      // ── Phase 1 Candidates ──────────────────────────────────────────────
+      primary: {
+        label: "Phase 1 Candidate 1 — Primary: Cinematic drop-anticipation (no callout grid)",
+        from: "NBA Top Shot <drops@nbatopshot.com>",
+        emailHero: {
+          src: "{{drop.hero_image}}",
+          alt: "{{drop.set_name}} — {{drop.featured_player_marquee}}",
+          liquidCaption: "Full-bleed drop art, curator-provided per drop. No text overlay.",
+        },
+        subject: "The first one from this Era.",
+        preheader: "{{drop.featured_player_marquee}}. {{drop.live_at | date: \"%A, %-l %p ET\"}}.",
+        body: [
+          "First Duke #1 since Zion. Pre-draft consensus called him the most complete prospect since LeBron.",
+          "The Rookie Era starts {{drop.live_at | date: \"%A, %B %-d at %-l %p ET\"}}. {{drop.circulation_total}} packs. {{drop.moment_count}} Moments inside the run. One chance.",
+          "Queue opens {{drop.queue_open_at | date: \"%-l:%M %p ET\"}}.",
+          "{% if customer.fav_team_match %}{{customer.fav_team_match.line}}{% endif %}",
+          "{% if customer.last_pack_purchased_at != blank %}See your last pack →{% endif %}",
+        ],
+        cta: "Set the reminder",
+        voice_notes:
+          "Drop-anticipation cinematic. NO callout grid — directly addresses v1003 kill reason (same template table in every email). 47 words body. Three beats: legend, time/scarcity arithmetic, queue time. Behavioral hooks: {{drop.featured_player_marquee}}, {{drop.live_at}}, {{drop.queue_open_at}}, {{customer.fav_team_match}} (optional). Self-scored 4/5/5/3/5/5/5/4/NA/4/4/4 = 48 rubric. NOTE: \"Pre-draft consensus called him the most complete prospect since LeBron\" — verify or scope to \"alongside the most complete prospects of the last 20 years\" before production (Roham's D12 flag).",
+      },
+      alt_a: {
+        label: "Phase 1 Candidate 2 — Alternate A: Chronicler drop-anticipation (narrative body, no grid)",
+        from: "NBA Top Shot <drops@nbatopshot.com>",
+        emailHero: {
+          src: "{{drop.hero_image}}",
+          alt: "{{drop.set_name}} — {{drop.featured_player_marquee}}",
+        },
+        subject: "Eight thousand five hundred packs. The Rookie Era opens Friday.",
+        preheader: "First Duke #1 since Zion. {{drop.live_at | date: \"%A, %-l %p ET\"}}.",
+        body: [
+          "Cooper Flagg is the first Duke player to go #1 since Zion. The pre-draft scouting record had him alongside the most complete prospects of the last 20 years. He arrives in a season where every rookie tier — Wembanyama's, Flagg's, the cohort that defines this era — is being minted while the games are still live.",
+          "The Rookie Era is the document of his first year. {{drop.moment_count}} Moments. {{drop.circulation_total}} packs. Sealed by the buzzer.",
+          "{% if drop.previous_comparable %}The last comparable Premium drop — {{drop.previous_comparable.set_name}} — sold out in {{drop.previous_comparable.sellout_minutes}} minutes. Floor today: {{drop.previous_comparable.floor_today}}.{% endif %}",
+          "Queue opens {{drop.queue_open_at | date: \"%A %B %-d at %-l:%M %p ET\"}}. {{drop.live_at | date: \"%A %-l %p ET\"}} live.",
+          "{% if customer.last_pack_purchased_at != blank %}You opened your last pack {{customer.last_pack_purchased_at | date: \"%b %-d\"}}. The serial you pull from this one is the one that goes on the wall in five years.{% endif %}",
+        ],
+        cta: "Set the reminder",
+        voice_notes:
+          "Chronicler/market-read crossover drop-anticipation. 145 body words including conditional. No callout grid. Sets the drop in historical context without the v1003 supply-discipline paragraph that read internal-talk. Behavioral hooks: {{drop.circulation_total}}, {{drop.moment_count}}, {{drop.previous_comparable}} (guarded), {{customer.last_pack_purchased_at}} (guarded). D11 note: previous_comparable.sellout_minutes may be BLOCKED at mart-schema level — fallback path (Wemby/Bronny secondary-velocity sentence) must be templated before first fire. Recommended for broad-newsletter audience when drop carries narrative weight (rookie debuts, champion-tier players).",
+      },
+      alt_b: {
+        label: "Phase 1 Candidate 3 — Alternate B: Bloomberg-tape minimal (calendar entry + structured callout)",
+        from: "NBA Top Shot Brief <brief@nbatopshot.com>",
+        emailHero: {
+          src: "{{drop.datacard_image_url}}",
+          alt: "{{drop.set_name}} — {{drop.tier}} tier · {{drop.circulation_total}} packs",
+          liquidCaption: "Full-bleed drop data card. NOT a generic platform image.",
+        },
+        subject: "{{drop.name}} live {{drop.live_at | date: \"%a %-l %p ET\"}}.",
+        preheader: "{{drop.set_name}} · {{drop.tier}} · {{drop.starting_price}} · {{drop.circulation_total}} packs.",
+        callouts: [
+          { label: "Set", value: "{{drop.set_name}} · {{drop.tier}}" },
+          { label: "Marquee", value: "{{drop.featured_player_marquee}}" },
+          { label: "Pack price", value: "{{drop.starting_price}}" },
+          { label: "Circulation", value: "{{drop.circulation_total}} packs · {{drop.moment_count}} Moments" },
+          { label: "Queue opens", value: "{{drop.queue_open_at | date: \"%a %b %-d, %-l:%M %p ET\"}}" },
+          { label: "Live", value: "{{drop.live_at | date: \"%a %-l:%M %p ET\"}}" },
+        ],
+        body: [
+          "Drop calendar entry. Queue mechanics: fair-allocation, not first-come.",
+          "{% if customer.last_pack_purchased_at != blank %}You last opened a pack {{customer.last_pack_purchased_at | date: \"%b %-d\"}}.{% else %}Set the reminder if you want to be in the queue.{% endif %}",
+        ],
+        cta: "Set a reminder",
+        voice_notes:
+          "Bloomberg-tape / drop calendar / Frame C register. 32 body words. One callout block (the ONE place tabular data is appropriate — load-bearing event facts collectors will scan). Distinct from v1001/v1002 Brief variants: data-card hero (vs. cinematic drop art), 6-row event-fact table (vs. 4-row set-facts). Best deployed as segment-specific variant for set-completionists / repeat-drop-buyers (≥3 prior drops opened, fav_team_match populated). Self-scored 5/NA/4/3/5/5/4/4/NA/4/4/5 = 43 rubric.",
       },
     },
     reviewer_ask:
@@ -942,6 +1237,86 @@ export const CARDS: UpgradeCard[] = [
         cta: "Finish your purchase",
         voice_notes:
           "v1001 swaps the cliché for chronicler-of-marketplace voice. Frame C strips it further to a position summary: listing state, two band comps, exit. Treats the open cart as an open order on a desk, not a missed shot.",
+      },
+      // ── Phase 1 Candidates ──────────────────────────────────────────────
+      primary: {
+        label: "Phase 1 Candidate 1 — Primary: Social-Proof Anchored (Roham's brief: 'Hey, others have purchased Moments from X player')",
+        from: "NBA Top Shot Marketplace <market@nbatopshot.com>",
+        emailHero: {
+          src: "{{event.moment_image_url}}",
+          alt: "{{event.player}} {{event.playCategory}} — {{event.setName}}",
+          liquidCaption: "Single Moment image, full-bleed hero. Not pack art, not platform graphic.",
+        },
+        subject: "{{event.last_24h_sales}} collectors bought a {{event.player}} Moment in the last 24 hours.",
+        preheader: "Yours is still on the Marketplace. Serial #{{event.serial}}, {{event.setName}}.",
+        body: [
+          "**{{event.last_24h_sales}}.**",
+          "That's how many {{event.player}} Moments cleared on the Marketplace in the last 24 hours. The highest of them cleared at **{{event.last_24h_max}}**.",
+          "---",
+          "The one you opened a cart on is still here.",
+          "**{{event.player}} — {{event.playCategory}}.** Serial **#{{event.serial}}**, from **{{event.setName}}**, {{event.tier}} tier, {{event.circulationCount}} mints in circulation. Listed at **{{event.listing_price}}**.",
+          "The listing has not moved since you opened it.",
+          "---",
+          "**What collectors paid for serials in your band, recently:**",
+          "{% for sale in event.recent_serial_band_sales %}• Serials {{sale.serial_range}} cleared **{{sale.amount}}** on {{sale.sold_at | date: \"%b %-d\"}}{% endfor %}",
+          "Your serial sits inside that band. The band is the language a Moment speaks in.",
+          "---",
+          "{{customer.team_count_at_moment}} other collectors who hold {{event.teamAtMoment}} Moments were active on the Marketplace this week. The Moment you came in for is still listed at the price you saw it.",
+          "The door is open if you want it.",
+        ],
+        cta: "Finish your purchase",
+        voice_notes:
+          "Directly answers Roham's brief: 'Hey, others have purchased Moments from X player.' Social-proof number IS the lead — first thing the collector reads. Number-as-hero silhouette unique in the email deck. 6 behavioral data refs: {{event.last_24h_sales}}, {{event.last_24h_max}}, {{event.player}}, {{event.serial}}, {{event.recent_serial_band_sales}} loop, {{customer.team_count_at_moment}}. NEW ENGINEERING HOOKS: event.last_24h_sales (count of player sales in 24h), event.last_24h_max (highest 24h sale price), both computed at send time from dapperlabs-data marketplace table. 48/50 rubric. PRIMARY RECOMMENDATION.",
+      },
+      alt_a: {
+        label: "Phase 1 Candidate 2 — Alternate A: Moment-as-Hero (image-dominant, inline social proof)",
+        from: "NBA Top Shot <drops@nbatopshot.com>",
+        emailHero: {
+          src: "{{event.moment_image_url}}",
+          alt: "{{event.player}} {{event.playCategory}} — {{event.setName}}",
+          liquidCaption: "Full-bleed Moment image. The Moment occupies ~60% of vertical space above the fold.",
+        },
+        subject: "{{event.player}} #{{event.serial}}. Still here.",
+        preheader: "{{event.setName}} · serial #{{event.serial}} of {{event.circulationCount}} · listed at {{event.listing_price}}.",
+        body: [
+          "**The play already happened.**",
+          "{{event.player}}'s {{event.playCategory}}, in a {{event.teamAtMoment}} jersey, in {{event.setName}}. Serial **#{{event.serial}}** of **{{event.circulationCount}}**.",
+          "One serial. One owner. The one you opened a cart on is still listed at **{{event.listing_price}}**, untouched.",
+          "---",
+          "In the last 24 hours, **{{event.last_24h_sales}} collectors** bought a {{event.player}} Moment on the Marketplace. The serial you opened is not one of them.",
+          "{{event.set_chronicler_note}}",
+          "---",
+          "**Most recent comp in your band:** Serials **{{event.recent_serial_band_sales[0].serial_range}}** cleared **{{event.recent_serial_band_sales[0].amount}}** on {{event.recent_serial_band_sales[0].sold_at | date: \"%b %-d\"}}.",
+        ],
+        cta: "OWN THE MOMENT",
+        voice_notes:
+          "Cinematic-brief register. Moment image dominates above the fold. Social proof is one inline sentence — calibrated for 'Moment is hero' register. Single comp (most recent), not a loop of three. 47/50 rubric. Best A/B test partner for Primary — measures social-proof-lead vs. Moment-lead recovery rate. NOTE: 'The play already happened.' is the documented platform-chronicler opener (per Exemplar 2 — Roham-blessed), NOT BANNED-01 'the play itself.'",
+      },
+      alt_b: {
+        label: "Phase 1 Candidate 3 — Alternate B: Set-Narrative Anchored (for collectors who buy based on what a set documents)",
+        from: "NBA Top Shot <marketplace@nbatopshot.com>",
+        emailHero: {
+          src: "{{event.moment_image_url}}",
+          alt: "{{event.player}} {{event.playCategory}} — {{event.setName}}",
+          liquidCaption: "Set-context layout — Moment image left-aligned; set name typeset large on right.",
+        },
+        subject: "{{event.setName}} is still being written. Your {{event.player}} chapter is open.",
+        preheader: "Serial #{{event.serial}}. Listing intact. {{event.last_24h_sales}} collectors bought into this chronicle in the last 24 hours.",
+        body: [
+          "**{{event.setName}}** {{event.set_chronicler_note}}",
+          "---",
+          "The Moment you opened a cart on is one of {{event.circulationCount}} mints across the **{{event.player}} {{event.playCategory}}** edition — a single chapter inside the set. Serial **#{{event.serial}}** sits in the band that documents the {{event.tier}} tier of that chapter.",
+          "The listing is at **{{event.listing_price}}**. It has not moved since you opened it.",
+          "---",
+          "**What's happening to this set right now:**",
+          "{{event.last_24h_sales}} {{event.player}} Moments cleared on the Marketplace in the last 24 hours. The highest of them at **{{event.last_24h_max}}**. Recent comparable sales in your serial band:",
+          "{% for sale in event.recent_serial_band_sales %}• Serials {{sale.serial_range}} — **{{sale.amount}}** ({{sale.sold_at | date: \"%b %-d\"}}){% endfor %}",
+          "Sets are not finished when they're minted. They become what the collector base decides they are. The collectors who carry the long memory of this platform are the ones who walk in while a set is still being written — not after the chronicle is closed.",
+          "Your serial is in the band. The chapter is open.",
+        ],
+        cta: "Finish your {{event.setName}} purchase",
+        voice_notes:
+          "Set-as-artifact chronicler. Social proof appears as supporting fact in beat 3, not lead in beat 1. Different weight from Primary. 45/50 rubric. Best fit for a separate trigger — the collector who has been browsing the same set repeatedly without buying — rather than first-touch cart recovery. Three-beat body structure: (1) what the set is, (2) what your Moment is inside the set, (3) what the market is doing to the set right now.",
       },
     },
     reviewer_ask:

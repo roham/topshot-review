@@ -26,6 +26,9 @@ const VARIANT_LABEL: Record<AfterVariantId, string> = {
   almanac: "Frame A — Almanac",
   cinematic: "Frame B — Cinematic",
   brief: "Frame C — Brief",
+  primary: "Phase 1 — Primary",
+  alt_a: "Phase 1 — Alt A",
+  alt_b: "Phase 1 — Alt B",
 };
 
 const VARIANT_DESC: Record<AfterVariantId, string> = {
@@ -33,6 +36,9 @@ const VARIANT_DESC: Record<AfterVariantId, string> = {
   almanac: "Stratechery-style chronicler-statesman · long-form narrative + comp data",
   cinematic: "Topps-style sensationalized legend · image-led + bold typography",
   brief: "Bloomberg-style market reporter · terse + data-dense",
+  primary: "Phase 1 candidate · primary direction",
+  alt_a: "Phase 1 candidate · Alt A direction",
+  alt_b: "Phase 1 candidate · Alt B direction",
 };
 
 const VARIANT_DOT: Record<AfterVariantId, string> = {
@@ -40,6 +46,9 @@ const VARIANT_DOT: Record<AfterVariantId, string> = {
   almanac: "bg-flame-500",
   cinematic: "bg-rose-500",
   brief: "bg-amber-500",
+  primary: "bg-violet-500",
+  alt_a: "bg-sky-500",
+  alt_b: "bg-pink-500",
 };
 
 const TOPSHOT_LOGO =
@@ -703,6 +712,8 @@ export function UpgradeCard({
 }) {
   const after = card.after[activeVariant];
   const ctx = MOCK_CONTEXTS[card.id] ?? {};
+
+  if (!after) return null;
 
   return (
     <article className="w-full max-w-[640px] mx-auto bg-ink-900/95 border border-white/10 rounded-3xl shadow-card overflow-hidden">
