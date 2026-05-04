@@ -90,8 +90,35 @@ function EmailRender({ after, ctx, mode }: { after: AfterBlock; ctx: LiquidConte
     <div className={`rounded-xl overflow-hidden border ${isLiquid ? "border-amber-500/20 bg-amber-500/[0.02]" : "border-mint-500/20 bg-mint-500/[0.04]"}`}>
       {/* Mode badge */}
       <div className={`px-3 py-1.5 text-[10px] uppercase tracking-[0.18em] font-bold border-b ${isLiquid ? "border-amber-500/20 bg-amber-500/10 text-amber-300" : "border-mint-500/20 bg-mint-500/10 text-mint-300"}`}>
-        {isLiquid ? "Customer.io · Liquid template (programmable form)" : "Rendered · what the customer sees (mock data)"}
+        {isLiquid ? "Customer.io · Liquid template — programmable form" : "Rendered preview — mock collector data"}
       </div>
+
+      {/* Mock persona badge — rendered mode only */}
+      {!isLiquid && (() => {
+        const p = ctx.customer as Record<string, unknown> | undefined;
+        if (!p) return null;
+        const name = p.userName as string ?? "Collector";
+        const moments = p.lifetime_moments_owned as string | number | undefined;
+        const joined = p.first_session_at ? new Date(p.first_session_at as string).getFullYear() : null;
+        const lastSeen = p.last_session_days_ago as string | number | undefined;
+        const tier = p.lifetime_stage as string | undefined;
+        return (
+          <div className="mx-3 mt-3 flex items-center gap-2.5 rounded-lg border border-white/10 bg-white/[0.025] px-3 py-2">
+            <div className="h-7 w-7 rounded-full bg-gradient-to-br from-flame-500 to-flame-700 grid place-items-center text-white text-[11px] font-bold flex-shrink-0">
+              {name[0]}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-[11px] font-semibold text-ink-100">
+                {name} · mock collector{tier ? ` · ${tier}` : ""}
+              </div>
+              <div className="text-[10px] text-ink-400 font-mono">
+                {moments != null && `${moments} Moments`}{joined != null && ` · since ${joined}`}{lastSeen != null && ` · last seen ${lastSeen}d ago`}
+              </div>
+            </div>
+            <div className="text-[9px] uppercase tracking-wider text-ink-600 font-semibold flex-shrink-0">mock</div>
+          </div>
+        );
+      })()}
 
       {/* Email-style header */}
       <div className="px-3 py-2 border-b border-white/10 bg-white/[0.02]">
@@ -134,7 +161,15 @@ function EmailRender({ after, ctx, mode }: { after: AfterBlock; ctx: LiquidConte
             </div>
           ) : (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={safeHeroSrc} alt={heroAlt} className="w-full block" />
+            <img
+              src={safeHeroSrc}
+              alt={heroAlt}
+              className="w-full block"
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = "/cards/infographics/moment-hero-placeholder.png";
+              }}
+            />
           )}
           {after.emailHero.liquidCaption && (
             <div className="px-3 py-1.5 bg-flame-500/10 border-t border-flame-500/20 text-[10px] font-mono text-flame-300 text-center">
@@ -243,7 +278,7 @@ export function UpgradeCard({
           </span>
         </div>
         <div className="absolute bottom-5 left-5 right-5">
-          <div className="text-[11px] uppercase tracking-[0.18em] text-flame-300 font-semibold">Customer.io upgrade · v1003</div>
+          <div className="text-[11px] uppercase tracking-[0.18em] text-flame-300 font-semibold">Customer.io upgrade · v1004</div>
           <h2 className="mt-1.5 font-display text-2xl sm:text-3xl font-semibold tracking-tight text-ink-50 leading-[1.1] text-balance">
             {card.stack_item}
           </h2>

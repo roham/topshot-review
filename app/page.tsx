@@ -22,7 +22,7 @@ export default function Home() {
     <main className="min-h-[100dvh] flex flex-col">
       <header className="px-6 pt-6 pb-2 flex items-center justify-between">
         <Logo />
-        <span className="text-[11px] uppercase tracking-wider text-ink-500">v1003</span>
+        <span className="text-[11px] uppercase tracking-wider text-ink-500">v1004</span>
       </header>
 
       <div className="flex-1 grid place-items-center px-6 py-10">

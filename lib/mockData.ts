@@ -90,6 +90,7 @@ const MARCUS_WHALE: MockContext = {
   first_session_at: "2020-10-22T18:00:00Z",
   portfolio_7d_change: "+4.2%",
   portfolio_positions_moved: "27",
+  whale_chart_image_url: ASSETS.whaleChart,
 };
 
 const WEEK: MockContext = {
@@ -104,6 +105,7 @@ const MARKET: MockContext = {
   active_set_count: "23",
   new_drops_this_week: "5",
   serial_max: "65,000",
+  dashboard_image_url: ASSETS.marketDashboard,
 };
 
 // ===================================================================
@@ -136,6 +138,7 @@ export const MOCK_CONTEXTS: Record<string, MockContext> = {
       set_7d_median_price: "$185",
       set_floor_today: "$72",
       set_floor_change_7d: "+18%",
+      setcard_image_url: ASSETS.setcard,
       set_top_3_recent_sales: [
         {
           player: "Cooper Flagg",
@@ -175,6 +178,7 @@ export const MOCK_CONTEXTS: Record<string, MockContext> = {
       winRank: "Top 8%",
       fastBreakId: "fb-2026-05-03",
       claim_expires_at: "2026-05-04T23:59:00Z",
+      scorecard_image_url: ASSETS.fastBreakScorecard,
     },
   },
 
@@ -203,6 +207,7 @@ export const MOCK_CONTEXTS: Record<string, MockContext> = {
       },
       serial_max: "8,500",
       likely_first_movers: "Whale collectors, Cooper Flagg-set completists",
+      datacard_image_url: ASSETS.dropDatacard,
     },
     market: MARKET,
   },
