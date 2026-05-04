@@ -14,24 +14,16 @@ type Feedback = {
   ts: string;
 };
 
-const VARIANT_ORDER: AfterVariantId[] = ["v1001", "almanac", "cinematic", "brief", "primary", "alt_a", "alt_b"];
+const VARIANT_ORDER: AfterVariantId[] = ["c1", "c2", "c3"];
 const VARIANT_LABELS: Record<AfterVariantId, string> = {
-  v1001: "v1001",
-  almanac: "Almanac",
-  cinematic: "Cinematic",
-  brief: "Brief",
-  primary: "Primary",
-  alt_a: "Alt A",
-  alt_b: "Alt B",
+  c1: "C1 — Primary",
+  c2: "C2 — Alt A",
+  c3: "C3 — Alt B",
 };
 const VARIANT_TONE: Record<AfterVariantId, string> = {
-  v1001: "text-mint-300",
-  almanac: "text-flame-300",
-  cinematic: "text-rose-300",
-  brief: "text-amber-300",
-  primary: "text-violet-300",
-  alt_a: "text-sky-300",
-  alt_b: "text-pink-300",
+  c1: "text-mint-300",
+  c2: "text-flame-300",
+  c3: "text-rose-500",
 };
 
 export default function AdminPage() {
@@ -54,7 +46,7 @@ export default function AdminPage() {
   (data ?? []).forEach((f) => {
     const v: AfterVariantId = (f.variant ?? "v1001") as AfterVariantId;
     if (!byPieceVariant[f.piece_id]) {
-      byPieceVariant[f.piece_id] = { v1001: [], almanac: [], cinematic: [], brief: [], primary: [], alt_a: [], alt_b: [] };
+      byPieceVariant[f.piece_id] = { c1: [], c2: [], c3: [] };
     }
     byPieceVariant[f.piece_id][v].push(f);
   });

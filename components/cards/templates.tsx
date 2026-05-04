@@ -86,6 +86,23 @@ const HERO_PLACEHOLDER = "/cards/infographics/moment-hero-placeholder.png";
 
 type ResolveMode = "rendered" | "liquid";
 
+/**
+ * Map Phase H variant IDs (c1/c2/c3) to legacy semantic names used in
+ * per-template isCinematic/isAlmanac/isBrief checks throughout this file.
+ * c1 = v1001-style (default), c2 = almanac-style, c3 = cinematic-style.
+ */
+function resolveVariantStyle(variant: AfterVariantId): {
+  isCinematic: boolean;
+  isBrief: boolean;
+  isAlmanac: boolean;
+} {
+  return {
+    isCinematic: variant === "c3",
+    isBrief: false,       // no brief silhouette in Phase H — c3 takes cinematic
+    isAlmanac: variant === "c2",
+  };
+}
+
 /** Render markdown-ish bold (**text**) as <strong>; preserve linebreaks elsewhere. */
 function MdLine({ text }: { text: string }) {
   const parts: (string | { bold: string })[] = [];
@@ -498,9 +515,7 @@ function WelcomeTemplate({ variant, after, ctx, mode }: RenderArgs) {
   const isLiquid = mode === "liquid";
 
   // Variant-specific shape adjustments
-  const isCinematic = variant === "cinematic";
-  const isBrief = variant === "brief";
-  const isAlmanac = variant === "almanac";
+  const { isCinematic, isBrief, isAlmanac } = resolveVariantStyle(variant);
 
   return (
     <TemplateOuter mode={mode} templateId="welcome" variant={variant}>
@@ -536,8 +551,8 @@ function WelcomeTemplate({ variant, after, ctx, mode }: RenderArgs) {
         </div>
       )}
 
-      {/* Almanac & v1001: stepped definition block */}
-      {(isAlmanac || variant === "v1001") && after.callouts && (
+      {/* c1/almanac-style: stepped definition block */}
+      {(isAlmanac || variant === "c1") && after.callouts && (
         <CalloutGrid callouts={after.callouts} ctx={ctx} mode={mode} accent="flame" />
       )}
 
@@ -549,8 +564,8 @@ function WelcomeTemplate({ variant, after, ctx, mode }: RenderArgs) {
       {/* Body — narrative or sparse depending on variant */}
       <BodyParagraphs body={after.body} ctx={ctx} mode={mode} />
 
-      {/* Welcome-specific journey footer: only show in v1001 + Almanac, not in Cinematic/Brief */}
-      {(isAlmanac || variant === "v1001") && !isLiquid && (
+      {/* Welcome-specific journey footer: only show in c1 + c2-almanac, not in c3-cinematic */}
+      {(isAlmanac || variant === "c1") && !isLiquid && (
         <div className="mx-3 mb-3 mt-1 grid grid-cols-2 gap-2">
           <div className="rounded-lg border border-flame-500/25 bg-flame-500/[0.05] px-3 py-2.5">
             <div className="text-[9px] uppercase tracking-wider text-flame-300 font-semibold">
@@ -572,8 +587,8 @@ function WelcomeTemplate({ variant, after, ctx, mode }: RenderArgs) {
       )}
 
       <PrimaryCta label={cta} mode={mode} uppercase={isCinematic} />
-      {/* Ghost-link secondary CTA — only on Almanac/v1001 (the "explainer-curious" path) */}
-      {(isAlmanac || variant === "v1001") && (
+      {/* Ghost-link secondary CTA — only on c1/c2-almanac */}
+      {(isAlmanac || variant === "c1") && (
         <GhostCtaLink label="New here? See how it works" mode={mode} />
       )}
 
@@ -600,8 +615,7 @@ function PackReceivedTemplate({ variant, after, ctx, mode }: RenderArgs) {
   const preheader = resolveOrRaw(after.preheader, ctx, mode);
   const cta = resolveOrRaw(after.cta, ctx, mode);
 
-  const isCinematic = variant === "cinematic";
-  const isBrief = variant === "brief";
+  const { isCinematic, isBrief } = resolveVariantStyle(variant);
 
   return (
     <TemplateOuter mode={mode} templateId="pack-received" variant={variant}>
@@ -683,8 +697,7 @@ function WhaleTierTemplate({ variant, after, ctx, mode }: RenderArgs) {
   const preheader = resolveOrRaw(after.preheader, ctx, mode);
   const cta = resolveOrRaw(after.cta, ctx, mode);
   const isLiquid = mode === "liquid";
-  const isCinematic = variant === "cinematic";
-  const isBrief = variant === "brief";
+  const { isCinematic, isBrief } = resolveVariantStyle(variant);
 
   // Pattern data is on ctx.whale.pattern_{1,2,3} — extract for the table
   const whale = (ctx.whale as Record<string, unknown> | undefined) ?? {};
@@ -886,8 +899,7 @@ function ReactivationTemplate({ variant, after, ctx, mode }: RenderArgs) {
   const preheader = resolveOrRaw(after.preheader, ctx, mode);
   const cta = resolveOrRaw(after.cta, ctx, mode);
   const isLiquid = mode === "liquid";
-  const isCinematic = variant === "cinematic";
-  const isBrief = variant === "brief";
+  const { isCinematic, isBrief } = resolveVariantStyle(variant);
 
   const customer = (ctx.customer as Record<string, unknown> | undefined) ?? {};
   const holdings = (customer.notable_holdings_moving as Record<string, string>[] | undefined) ?? [];
@@ -1010,8 +1022,8 @@ function ReactivationTemplate({ variant, after, ctx, mode }: RenderArgs) {
         </div>
       )}
 
-      {/* v1001/almanac non-brief: amber callout grid */}
-      {(variant === "v1001" || variant === "almanac") && after.callouts && (
+      {/* c1/c2 (almanac-style): amber callout grid */}
+      {(!isCinematic && !isBrief) && after.callouts && (
         <CalloutGrid callouts={after.callouts} ctx={ctx} mode={mode} accent="amber" />
       )}
 
@@ -1034,14 +1046,13 @@ function FastBreakTemplate({ variant, after, ctx, mode }: RenderArgs) {
   const preheader = resolveOrRaw(after.preheader, ctx, mode);
   const cta = resolveOrRaw(after.cta, ctx, mode);
   const isLiquid = mode === "liquid";
-  const isCinematic = variant === "cinematic";
-  const isBrief = variant === "brief";
+  const { isCinematic, isBrief } = resolveVariantStyle(variant);
 
   const customer = (ctx.customer as Record<string, unknown> | undefined) ?? {};
   const event = (ctx.event as Record<string, unknown> | undefined) ?? {};
 
   const showScoreboard = !isBrief;
-  const showLineupGrid = (variant === "v1001" || variant === "almanac") && !isLiquid;
+  const showLineupGrid = !isCinematic && !isBrief && !isLiquid;
 
   const lineupStr = (event.lineupPlayers as string | undefined) ?? "";
   const lineupParts = lineupStr ? lineupStr.split(" · ") : [];
@@ -1128,7 +1139,7 @@ function FastBreakTemplate({ variant, after, ctx, mode }: RenderArgs) {
         </div>
       )}
 
-      {(variant === "v1001" || variant === "almanac") && after.callouts && (
+      {(!isCinematic && !isBrief) && after.callouts && (
         <CalloutGrid callouts={after.callouts} ctx={ctx} mode={mode} accent="mint" />
       )}
       {isBrief && after.callouts && (
@@ -1139,8 +1150,8 @@ function FastBreakTemplate({ variant, after, ctx, mode }: RenderArgs) {
       <PrimaryCta label={cta || "Claim your pack"} mode={mode} uppercase={isCinematic} />
       {!isBrief && <GhostCtaLink label="Set tomorrow's lineup" mode={mode} />}
 
-      {/* Streak footer — v1001/almanac rendered */}
-      {(variant === "v1001" || variant === "almanac") && !isLiquid && (
+      {/* Streak footer — c1/c2 rendered */}
+      {(!isCinematic && !isBrief) && !isLiquid && (
         <div className="mx-3 mb-2 mt-1 px-3 py-2 rounded-lg border border-white/10 bg-white/[0.02] text-center">
           <div className="font-mono text-[11px] text-ink-400">
             <span className="text-mint-300 font-semibold">
@@ -1171,9 +1182,8 @@ function DropAnnouncementTemplate({ variant, after, ctx, mode }: RenderArgs) {
   const preheader = resolveOrRaw(after.preheader, ctx, mode);
   const cta = resolveOrRaw(after.cta, ctx, mode);
   const isLiquid = mode === "liquid";
-  const isCinematic = variant === "cinematic";
-  const isBrief = variant === "brief";
-  const isV1001orAlmanac = variant === "v1001" || variant === "almanac";
+  const { isCinematic, isBrief, isAlmanac } = resolveVariantStyle(variant);
+  const isV1001orAlmanac = !isCinematic && !isBrief;
 
   const drop = (ctx.drop as Record<string, unknown> | undefined) ?? {};
 
@@ -1329,8 +1339,7 @@ function AbandonedCartTemplate({ variant, after, ctx, mode }: RenderArgs) {
   const preheader = resolveOrRaw(after.preheader, ctx, mode);
   const cta = resolveOrRaw(after.cta, ctx, mode);
   const isLiquid = mode === "liquid";
-  const isCinematic = variant === "cinematic";
-  const isBrief = variant === "brief";
+  const { isCinematic, isBrief } = resolveVariantStyle(variant);
 
   const event = (ctx.event as Record<string, unknown> | undefined) ?? {};
 
@@ -1471,8 +1480,8 @@ function AbandonedCartTemplate({ variant, after, ctx, mode }: RenderArgs) {
         </div>
       )}
 
-      {/* CalloutGrid — mint for v1001/almanac; amber for brief */}
-      {(variant === "v1001" || variant === "almanac") && after.callouts && (
+      {/* CalloutGrid — mint for c1/c2; amber for brief */}
+      {(!isCinematic && !isBrief) && after.callouts && (
         <CalloutGrid callouts={after.callouts} ctx={ctx} mode={mode} accent="mint" />
       )}
       {isBrief && after.callouts && (
@@ -1517,7 +1526,7 @@ function GenericShellTemplate({
         <CalloutGrid callouts={after.callouts} ctx={ctx} mode={mode} accent={accent} />
       )}
       <BodyParagraphs body={after.body} ctx={ctx} mode={mode} />
-      <PrimaryCta label={cta} mode={mode} uppercase={variant === "cinematic"} />
+      <PrimaryCta label={cta} mode={mode} uppercase={resolveVariantStyle(variant).isCinematic} />
       <BrandFooter mode={mode} />
       {/* Stub-status banner so reviewers know which templates are fleshed out vs. fallback */}
       {mode === "rendered" && (

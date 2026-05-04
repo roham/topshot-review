@@ -41,7 +41,7 @@ export default function ReviewPage() {
 
   // Compute total steps for email variants
   const emailStepCount = CARDS.reduce((acc, card) => {
-    const variantKeys = ["v1001", "almanac", "cinematic", "brief", "primary", "alt_a", "alt_b"] as const;
+    const variantKeys = ["c1", "c2", "c3"] as const;
     return acc + variantKeys.filter((v) => card.after[v] != null).length;
   }, 0);
 
@@ -64,9 +64,9 @@ export default function ReviewPage() {
           <DeckCard
             title="Email Variants"
             subtitle={`${CARDS.length} emails · ${emailStepCount} total variants`}
-            description="7 Customer.io lifecycle emails — 4 base variants each + Phase-1 candidates (Primary / Alt A / Alt B) for 5 of them. Vote ship / needs-work / no on each variant individually."
+            description="7 Customer.io lifecycle emails — 15 Phase H net-new candidates (c1/c2/c3). Vote ship / needs-work / no on each variant individually."
             accent="flame"
-            badge="v1001 → Phase 1"
+            badge="Phase H · c1/c2/c3"
             onClick={() => setActiveDeck("email-variants")}
           />
           <DeckCard

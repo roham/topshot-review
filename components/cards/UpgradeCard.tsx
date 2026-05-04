@@ -22,33 +22,21 @@ const STATE_TONE: Record<UpgradeState, string> = {
 };
 
 const VARIANT_LABEL: Record<AfterVariantId, string> = {
-  v1001: "v1001 (current)",
-  almanac: "Frame A — Almanac",
-  cinematic: "Frame B — Cinematic",
-  brief: "Frame C — Brief",
-  primary: "Phase 1 — Primary",
-  alt_a: "Phase 1 — Alt A",
-  alt_b: "Phase 1 — Alt B",
+  c1: "C1 — Primary",
+  c2: "C2 — Alt A",
+  c3: "C3 — Alt B",
 };
 
 const VARIANT_DESC: Record<AfterVariantId, string> = {
-  v1001: "Platform-chronicler · what's shipping today",
-  almanac: "Stratechery-style chronicler-statesman · long-form narrative + comp data",
-  cinematic: "Topps-style sensationalized legend · image-led + bold typography",
-  brief: "Bloomberg-style market reporter · terse + data-dense",
-  primary: "Phase 1 candidate · primary direction",
-  alt_a: "Phase 1 candidate · Alt A direction",
-  alt_b: "Phase 1 candidate · Alt B direction",
+  c1: "Phase H candidate · primary direction",
+  c2: "Phase H candidate · Alt A direction",
+  c3: "Phase H candidate · Alt B direction",
 };
 
 const VARIANT_DOT: Record<AfterVariantId, string> = {
-  v1001: "bg-mint-500",
-  almanac: "bg-flame-500",
-  cinematic: "bg-rose-500",
-  brief: "bg-amber-500",
-  primary: "bg-violet-500",
-  alt_a: "bg-sky-500",
-  alt_b: "bg-pink-500",
+  c1: "bg-mint-500",
+  c2: "bg-flame-500",
+  c3: "bg-rose-500",
 };
 
 const TOPSHOT_LOGO =
@@ -687,13 +675,13 @@ function EmailRendered({
   if (templateId && FULL_TEMPLATES.has(templateId)) {
     return renderEmail({ templateId, variant, after, ctx, mode: "rendered" });
   }
+  // c1/c2/c3 map to visual silhouettes: c1=v1001-style, c2=almanac-style, c3=cinematic-style
   switch (variant) {
-    case "almanac":
+    case "c2":
       return <EmailAlmanac after={after} ctx={ctx} />;
-    case "cinematic":
+    case "c3":
       return <EmailCinematic after={after} ctx={ctx} />;
-    case "brief":
-      return <EmailBrief after={after} ctx={ctx} />;
+    case "c1":
     default:
       return <EmailV1001 after={after} ctx={ctx} />;
   }

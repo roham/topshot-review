@@ -5,27 +5,19 @@ import type { Card, AfterVariantId } from "@/lib/cards";
 import { CARDS, REASONS } from "@/lib/cards";
 import { UpgradeCard } from "./cards/UpgradeCard";
 
-const BASE_VARIANTS: AfterVariantId[] = ["v1001", "almanac", "cinematic", "brief"];
-const PHASE1_VARIANTS: AfterVariantId[] = ["primary", "alt_a", "alt_b"];
-const ALL_VARIANT_ORDER: AfterVariantId[] = [...BASE_VARIANTS, ...PHASE1_VARIANTS];
+const VARIANT_ORDER: AfterVariantId[] = ["c1", "c2", "c3"];
+// Alias for backward-compat with internal usage below
+const ALL_VARIANT_ORDER: AfterVariantId[] = VARIANT_ORDER;
 
 const VARIANT_LABEL: Record<AfterVariantId, string> = {
-  v1001: "v1001 (current)",
-  almanac: "Almanac",
-  cinematic: "Cinematic",
-  brief: "Brief",
-  primary: "Primary",
-  alt_a: "Alt A",
-  alt_b: "Alt B",
+  c1: "C1 — Primary",
+  c2: "C2 — Alt A",
+  c3: "C3 — Alt B",
 };
 const VARIANT_DOT: Record<AfterVariantId, string> = {
-  v1001: "bg-mint-500",
-  almanac: "bg-flame-500",
-  cinematic: "bg-rose-500",
-  brief: "bg-amber-500",
-  primary: "bg-violet-500",
-  alt_a: "bg-sky-500",
-  alt_b: "bg-pink-500",
+  c1: "bg-mint-500",
+  c2: "bg-flame-500",
+  c3: "bg-rose-500",
 };
 
 type Vote = "ship" | "no" | "needs-work";
