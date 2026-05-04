@@ -5,6 +5,10 @@ curator: Magic (Phase 0 Exemplar Curator agent)
 status: PENDING ROHAM SIGN-OFF
 methodology: Curated from existing collect-hq material only. No fabricated exemplars. 12-dimension rubric applied dimension-by-dimension to each candidate. BANNED-01..10 individually scanned per exemplar. Voice-mode taxonomy follows the Phase 0 prompt's 5-mode split (transactional, chronicler, drop-anticipation, reactivation, concierge) — distinct from the existing voice-exemplar-corpus.md's voice-register taxonomy.
 companion: 2026-05-04-rewrite-swarm-orchestration.md (this is the corpus drafter agents will read as voice context)
+decision-vote: true
+decision-question: "Gate 1: Do these 14 exemplars represent Magic voice accurately enough to use as drafter context?"
+decision-options: "approve,approve-with-notes,reject"
+decision-piece-id: gate1-exemplar-approval
 ---
 
 # Phase 0 — Magic Voice Exemplars

@@ -3,6 +3,10 @@ title: NBA Top Shot Email Program — Decision Brief for Roham
 date: 2026-05-04
 read-time: 90 seconds
 companion: 2026-05-04-cmo-action-framework.md
+decision-vote: true
+decision-question: "Approve the two-tier email split (whale-tier deferred)?"
+decision-options: "accept,modify,reject"
+decision-piece-id: cmo-email-split-decision
 ---
 
 # Email Program — Decision Brief
