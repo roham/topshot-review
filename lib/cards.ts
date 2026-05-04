@@ -256,9 +256,8 @@ export const CARDS: UpgradeCard[] = [
         label: "Proposed v1001 — Pack Received with set-chronicler voice + structured data",
         from: "NBA Top Shot <hello@nbatopshot.com>",
         emailHero: {
-          src: "https://userimg-assets.customeriomail.com/images/client-env-161112/1740722955824_01-NEW-COLLECTOR-FIRST-PACK2_01JN5JRSMVBKXQ9YK4ESN8FFAS.jpg",
+          src: "{{event.packImageURL}}",
           alt: "NBA Top Shot pack art",
-          liquidCaption: "Dynamic: {{event.packImageURL}}",
         },
         subject: "Your {{event.packTitle}} just landed. Here's the set inside.",
         preheader: "{{event.set_marquee_player}} headlines. {{event.setTier}} tier. {{event.setMomentCount}} Moments across the run.",
@@ -1007,7 +1006,9 @@ export const CARDS: UpgradeCard[] = [
           { label: "Pack price", value: "{{drop.starting_price}}" },
           { label: "Queue opens", value: "{{drop.queue_open_at | date: \"%a %b %-d, %-l:%M %p ET\"}}" },
           { label: "Live", value: "{{drop.live_at | date: \"%a %-l:%M %p ET\"}}" },
-          { label: "Last comparable drop", value: "{{drop.previous_comparable.set_name}} · sold out in {{drop.previous_comparable.sellout_minutes}}m · floor today {{drop.previous_comparable.floor_today}}" },
+          // Bug 2 fix (Phase G): sellout_minutes removed — BLOCKED metric (no drop open/close timestamp in mart schema).
+          // Replaced with secondary-velocity proxy: secondary_tx_7d (BQ-verified, 501 secondary transactions).
+          { label: "Last comparable drop", value: "{{drop.previous_comparable.set_name}} · {{drop.previous_comparable.secondary_tx_7d}} secondary transactions in 7d · floor today {{drop.previous_comparable.floor_today}}" },
         ],
         body: [
           "Drop calendar entry. Queue mechanics fair-allocation, not first-come. Comp drop above shows secondary trajectory.",
@@ -1050,7 +1051,8 @@ export const CARDS: UpgradeCard[] = [
         body: [
           "Cooper Flagg was the consensus No. 1 of the 2025 class. The pre-draft scouting record had him as the most complete two-way prospect of his draft — built for both ends before he turned 19. He arrives in a season where every rookie tier — Wembanyama's, Flagg's, the cohort that defines this era — is being minted while the games are still live.",
           "The Rookie Era is the document of his first year. {{drop.moment_count}} Moments. {{drop.circulation_total}} packs. Sealed by the buzzer.",
-          "{% if drop.previous_comparable %}The last comparable Premium drop — {{drop.previous_comparable.set_name}} — sold out in {{drop.previous_comparable.sellout_minutes}} minutes. Floor today: {{drop.previous_comparable.floor_today}}.{% endif %}",
+          // Bug 2 fix (Phase G): sellout_minutes removed — BLOCKED metric. Replaced with secondary-velocity proxy.
+          "{% if drop.previous_comparable %}The last comparable Premium drop — {{drop.previous_comparable.set_name}} — generated {{drop.previous_comparable.secondary_tx_7d}} secondary transactions in the first seven days. Floor today: {{drop.previous_comparable.floor_today}}.{% endif %}",
           "Queue opens {{drop.queue_open_at | date: \"%A %B %-d at %-l:%M %p ET\"}}. {{drop.live_at | date: \"%A %-l %p ET\"}} live.",
           "{% if customer.last_pack_purchased_at != blank %}You opened your last pack {{customer.last_pack_purchased_at | date: \"%b %-d\"}}. The serial you pull from this one is the one that goes on the wall in five years.{% endif %}",
         ],

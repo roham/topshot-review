@@ -394,7 +394,10 @@ export const MOCK_CONTEXTS: Record<string, MockContext> = {
       expected_serial_distribution: "Most packs will land in the 2,500-7,500 serial band; #1-#100 reserved for top-tier rewards.",
       previous_comparable: {
         set_name: "Series 8 Wembanyama",
-        sellout_minutes: "11",
+        // Bug 2 fix (Phase G): sellout_minutes: "11" removed — BLOCKED metric per social-proof-data.md.
+        // "sellout_minutes: BLOCKED — no drop open/close timestamp in mart schema."
+        // Replaced with BQ-verified secondary-velocity proxy per SOCIAL_PROOF.drop.
+        secondary_tx_7d: "501",
         floor_today: "$148",
       },
       serial_max: "8,500",
@@ -416,7 +419,9 @@ export const MOCK_CONTEXTS: Record<string, MockContext> = {
       circulationCount: "3,500",
       setMomentCount: "8",
       momentFlowID: "mitchell-pullup-2026",
-      moment_image_url: ASSETS.collectorFirstPack,
+      // Bug 1 fix (Phase G): collectorFirstPack is the new-collector welcome image — wrong context
+      // for an abandoned-cart email. Replaced with momentPlaceholder per Phase G audit spec.
+      moment_image_url: ASSETS.momentPlaceholder,
       teamAtMoment: "Cleveland Cavaliers",
       serial: "2,418",
       listing_price: "$245",
@@ -440,6 +445,14 @@ export const MOCK_CONTEXTS: Record<string, MockContext> = {
         },
       ],
       social_proof: SOCIAL_PROOF.abandonedCart,
+      // Bug 3 fix (Phase G): event.last_24h_sales and event.last_24h_max missing from mock context,
+      // causing unresolved {{...}} placeholders in Phase 1 Primary body.
+      // Values from SOCIAL_PROOF.abandonedCart (Jaylen Brown BQ-confirmed, used as Mitchell equivalent mock).
+      // Production values will come from per-player BQ lookup at send time.
+      last_24h_sales: "75",
+      last_24h_max: "$1,500",
+      // Also adding weekly_player_buyers as referenced in Alt A/B copy.
+      weekly_player_buyers: "47",
     },
   },
 
