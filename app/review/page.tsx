@@ -100,6 +100,28 @@ export default function ReviewPage() {
           />
         </div>
 
+        {/* Specimens link */}
+        <div className="mt-5">
+          <a
+            href="/specimens"
+            className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-5 py-4 hover:bg-white/[0.05] transition-colors"
+          >
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-0.5">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-mint-400">
+                  New
+                </span>
+                <span className="text-[10px] text-ink-500">·</span>
+                <span className="text-[11px] text-ink-400">Email Specimens</span>
+              </div>
+              <p className="text-[13px] text-ink-300 leading-snug">
+                5 hand-crafted emails. No generated content. Real data, real copy, bread-and-butter structure. Does this look like a real email?
+              </p>
+            </div>
+            <span className="text-ink-600 text-lg">→</span>
+          </a>
+        </div>
+
         {/* Footer */}
         <div className="mt-10 text-center text-[10.5px] text-ink-600">
           Logged in as <span className="text-ink-400 font-semibold">{voter}</span> ·{" "}
