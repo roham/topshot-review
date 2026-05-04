@@ -1,102 +1,114 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Card, AfterVariantId } from "@/lib/cards";
 import { REASONS } from "@/lib/cards";
 import { UpgradeCard } from "./cards/UpgradeCard";
 
-const VARIANTS: { id: AfterVariantId; label: string }[] = [
-  { id: "v1001", label: "v1001" },
-  { id: "almanac", label: "Almanac" },
-  { id: "cinematic", label: "Cinematic" },
-  { id: "brief", label: "Brief" },
-];
+const VARIANT_ORDER: AfterVariantId[] = ["v1001", "almanac", "cinematic", "brief"];
+const VARIANT_LABEL: Record<AfterVariantId, string> = {
+  v1001: "v1001",
+  almanac: "Almanac",
+  cinematic: "Cinematic",
+  brief: "Brief",
+};
+const VARIANT_DOT: Record<AfterVariantId, string> = {
+  v1001: "bg-mint-500",
+  almanac: "bg-flame-500",
+  cinematic: "bg-rose-500",
+  brief: "bg-amber-500",
+};
 
 type Vote = "ship" | "no" | "needs-work";
 
+type Step = { card: Card; variant: AfterVariantId; cardIdx: number; variantIdx: number };
+
 export function SwipeDeck({ cards, voter }: { cards: Card[]; voter: string }) {
-  const [index, setIndex] = useState(0);
-  const [activeVariant, setActiveVariant] = useState<AfterVariantId>("v1001");
-  const [showReasons, setShowReasons] = useState<{ vote: Vote; cardId: string } | null>(null);
+  const steps: Step[] = useMemo(
+    () =>
+      cards.flatMap((card, cardIdx) =>
+        VARIANT_ORDER.map((variant, variantIdx) => ({ card, variant, cardIdx, variantIdx }))
+      ),
+    [cards]
+  );
+  const total = steps.length; // 7 × 4 = 28
+
+  const [stepIndex, setStepIndex] = useState(0);
+  const [showReasons, setShowReasons] = useState<{ vote: Vote; cardId: string; variant: AfterVariantId } | null>(null);
   const [shipped, setShipped] = useState(0);
   const [killed, setKilled] = useState(0);
   const [needsWork, setNeedsWork] = useState(0);
 
-  const card = cards[index];
+  const step = steps[stepIndex];
 
-  // Scroll back to top + reset variant on each new card.
+  // Scroll back to top on each step change
   useEffect(() => {
     const el = document.getElementById("deck-scroll");
     if (el) el.scrollTop = 0;
-    setActiveVariant("v1001");
-  }, [index]);
+  }, [stepIndex]);
 
   const submit = async (vote: Vote, note?: string, reasons?: string[]) => {
-    if (!card) return;
+    if (!step) return;
     fetch("/api/feedback", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ piece_id: card.id, variant: activeVariant, vote, note, reasons, voter }),
+      body: JSON.stringify({
+        piece_id: step.card.id,
+        variant: step.variant,
+        vote,
+        note,
+        reasons,
+        voter,
+      }),
     }).catch(() => {});
     if (vote === "ship") setShipped((n) => n + 1);
     else if (vote === "no") setKilled((n) => n + 1);
     else setNeedsWork((n) => n + 1);
-    setIndex((i) => i + 1);
+    setStepIndex((i) => i + 1);
   };
 
-  if (!card) {
-    return <Done shipped={shipped} killed={killed} needsWork={needsWork} total={cards.length} voter={voter} />;
+  if (!step) {
+    return <Done shipped={shipped} killed={killed} needsWork={needsWork} total={total} voter={voter} />;
   }
 
   return (
     <div className="relative h-[100dvh] w-full overflow-hidden flex flex-col">
-      {/* Header */}
-      <div className="flex items-center gap-3 px-4 pt-4 pb-3 shrink-0 border-b border-white/5 bg-ink-950/80 backdrop-blur">
-        <div className="text-[11px] uppercase tracking-wider text-ink-400 font-semibold">{voter}</div>
-        <div className="flex-1 h-1 rounded-full bg-white/5 overflow-hidden">
-          <div className="h-full bg-gradient-to-r from-flame-400 to-flame-600 transition-all duration-500" style={{ width: `${(index / cards.length) * 100}%` }} />
+      {/* Header — single progress bar /28 */}
+      <div className="flex flex-col gap-1.5 px-4 pt-4 pb-3 shrink-0 border-b border-white/5 bg-ink-950/80 backdrop-blur">
+        <div className="flex items-center gap-3">
+          <div className="text-[11px] uppercase tracking-wider text-ink-400 font-semibold">{voter}</div>
+          <div className="flex-1 h-1 rounded-full bg-white/5 overflow-hidden">
+            <div className="h-full bg-gradient-to-r from-flame-400 to-flame-600 transition-all duration-500" style={{ width: `${(stepIndex / total) * 100}%` }} />
+          </div>
+          <div className="text-[11px] font-mono text-ink-300 tabular-nums">{stepIndex + 1}/{total}</div>
         </div>
-        <div className="text-[11px] font-mono text-ink-300 tabular-nums">{index + 1}/{cards.length}</div>
+        <div className="flex items-center justify-between text-[10px] uppercase tracking-wider text-ink-400">
+          <span>Card {step.cardIdx + 1} of {cards.length}</span>
+          <span className="inline-flex items-center gap-1.5">
+            <span className={`h-1.5 w-1.5 rounded-full ${VARIANT_DOT[step.variant]}`} />
+            <span className="text-ink-200 font-semibold">{VARIANT_LABEL[step.variant]}</span>
+            <span className="text-ink-500">· variant {step.variantIdx + 1}/4</span>
+          </span>
+        </div>
       </div>
 
       {/* Scrollable card area */}
-      <div id="deck-scroll" className="flex-1 overflow-y-auto overscroll-contain px-3 py-4 pb-44">
+      <div id="deck-scroll" className="flex-1 overflow-y-auto overscroll-contain px-3 py-4 pb-32">
         <AnimatePresence mode="wait">
           <motion.div
-            key={card.id}
+            key={`${step.card.id}-${step.variant}`}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.22 }}
           >
-            <UpgradeCard card={card} activeVariant={activeVariant} onVariantChange={setActiveVariant} />
+            <UpgradeCard card={step.card} activeVariant={step.variant} />
           </motion.div>
         </AnimatePresence>
       </div>
 
       {/* Sticky action bar */}
       <div className="absolute bottom-0 left-0 right-0 z-30 pb-[max(20px,env(safe-area-inset-bottom))] pt-3 bg-gradient-to-t from-ink-950 via-ink-950/95 to-transparent">
-        {/* Variant selector — always visible, no scrolling needed */}
-        <div className="px-4 mb-2">
-          <div className="text-[9.5px] uppercase tracking-wider text-ink-500 font-semibold text-center mb-1.5">
-            Compare frames · tap to switch
-          </div>
-          <div className="flex items-center gap-1.5">
-            {VARIANTS.map(({ id, label }) => (
-              <button
-                key={id}
-                onClick={() => setActiveVariant(id)}
-                className={`flex-1 h-8 rounded-xl text-[11px] font-bold uppercase tracking-wider transition border ${
-                  id === activeVariant
-                    ? "border-flame-500/60 bg-flame-500/20 text-flame-300"
-                    : "border-white/10 bg-white/[0.03] text-ink-400 hover:text-ink-200 hover:bg-white/[0.06]"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
         <div className="flex items-center justify-center gap-2 px-4">
           <button
             onClick={() => submit("no")}
@@ -106,7 +118,7 @@ export function SwipeDeck({ cards, voter }: { cards: Card[]; voter: string }) {
             <span className="text-rose-300 font-semibold text-[13px] tracking-wide">✕ Nope</span>
           </button>
           <button
-            onClick={() => setShowReasons({ vote: "needs-work", cardId: card.id })}
+            onClick={() => setShowReasons({ vote: "needs-work", cardId: step.card.id, variant: step.variant })}
             className="h-12 flex-1 max-w-[140px] rounded-2xl bg-amber-500/15 border border-amber-500/40 text-amber-300 text-[13px] tracking-wide font-semibold hover:bg-amber-500/25 active:scale-95 transition"
           >
             ⏸ Needs work
@@ -120,7 +132,7 @@ export function SwipeDeck({ cards, voter }: { cards: Card[]; voter: string }) {
           </button>
         </div>
         <div className="mt-1.5 text-center text-[10.5px] text-ink-400 uppercase tracking-wider">
-          voting on <span className="text-flame-400 font-semibold">{activeVariant}</span> · {card.position} of {cards.length}
+          Voting on <span className="text-flame-400 font-semibold">{VARIANT_LABEL[step.variant]}</span> · {stepIndex + 1} of {total}
         </div>
       </div>
 
@@ -154,16 +166,14 @@ function ReasonModal({ onSubmit, onClose }: { onSubmit: (note: string, reasons: 
         animate={{ y: 0 }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="text-[11px] uppercase tracking-wider text-amber-400 font-semibold">Needs work — what's off?</div>
+        <div className="text-[11px] uppercase tracking-wider text-amber-400 font-semibold">Needs work — what&apos;s off?</div>
         <div className="mt-3 flex flex-wrap gap-1.5">
           {REASONS.map((r) => {
             const on = picked.includes(r);
             return (
               <button
                 key={r}
-                onClick={() =>
-                  setPicked((p) => (on ? p.filter((x) => x !== r) : [...p, r]))
-                }
+                onClick={() => setPicked((p) => (on ? p.filter((x) => x !== r) : [...p, r]))}
                 className={`text-[12px] px-2.5 py-1.5 rounded-full border transition ${
                   on
                     ? "bg-flame-500/20 border-flame-500/50 text-flame-200"
@@ -196,9 +206,9 @@ function Done({ shipped, killed, needsWork, total, voter }: { shipped: number; k
   return (
     <div className="min-h-[100dvh] grid place-items-center px-6 py-12">
       <div className="max-w-md w-full text-center">
-        <div className="text-[10px] uppercase tracking-[0.2em] text-flame-400 font-semibold">{voter}, you're done</div>
+        <div className="text-[10px] uppercase tracking-[0.2em] text-flame-400 font-semibold">{voter}, you&apos;re done</div>
         <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-ink-50 text-balance">Thanks. Magic iterates from here.</h2>
-        <p className="mt-2 text-[14px] text-ink-300">All {total} upgrade cards reviewed. The Customer.io rebuild starts from your feedback.</p>
+        <p className="mt-2 text-[14px] text-ink-300">All {total} variants reviewed across 7 cards. The Customer.io rebuild starts from your feedback.</p>
         <div className="mt-8 grid grid-cols-3 gap-3">
           <div className="rounded-2xl border border-mint-500/30 bg-mint-500/5 p-4">
             <div className="text-3xl font-display font-bold text-mint-400">{shipped}</div>

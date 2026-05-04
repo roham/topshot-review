@@ -31,13 +31,13 @@ export default function Home() {
             Customer.io rebuild · marketing review
           </div>
           <h1 className="mt-3 font-display text-[40px] sm:text-5xl font-semibold tracking-tight text-ink-50 text-balance leading-[1.05]">
-            Seven programmatic email upgrades.
+            Seven emails. Four versions of each.
           </h1>
           <p className="mt-4 text-[15px] sm:text-base text-ink-300 text-pretty leading-relaxed">
-            Each card is one Customer.io flow Magic wants to upgrade — grounded in live workspace data, BQ-baselined audience numbers, and a real before-vs-after with actual images.{" "}
-            For each one: <span className="text-mint-400 font-semibold">ship it</span>,{" "}
+            Each card is rendered with mock data so you see exactly what the customer would receive — plus the underlying Customer.io Liquid template stacked below. Vote on all 28 variants:{" "}
+            <span className="text-mint-400 font-semibold">ship it</span>,{" "}
             <span className="text-rose-400 font-semibold">nope</span>, or{" "}
-            <span className="text-amber-400 font-semibold">needs work</span>. About 10 minutes.
+            <span className="text-amber-400 font-semibold">needs work</span>. About 15 minutes.
           </p>
 
           <div className="mt-7 max-w-sm mx-auto">
@@ -68,9 +68,9 @@ export default function Home() {
 
           <div className="mt-12 grid grid-cols-3 gap-3 text-left">
             {[
-              { n: "7", l: "Upgrades" },
-              { n: "~10 min", l: "To review" },
-              { n: "Live data", l: "BQ + Customer.io" },
+              { n: "28", l: "Variants to vote" },
+              { n: "~15 min", l: "Linear flow" },
+              { n: "Mock + Liquid", l: "Both shown" },
             ].map((x) => (
               <div key={x.l} className="rounded-2xl border border-white/10 bg-white/[0.02] p-3">
                 <div className="font-display text-[15px] sm:text-base font-semibold text-ink-50">{x.n}</div>
