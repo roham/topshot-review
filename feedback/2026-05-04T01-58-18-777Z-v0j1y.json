@@ -1,0 +1,8 @@
+{
+  "piece_id": "reactivation-drip",
+  "vote": "needs-work",
+  "note": "This is really good, but I think we need to go through and actually apply specifics. We need to look up specific moment purchases. We need to do the math for specific users, because in a lot of cases the math might not be positive. In that case, then it won't be convincing, but if it is positive, then I like the idea, so it's worth pushing this to the next step and marking up specifics.",
+  "reasons": [],
+  "voter": "ro",
+  "ts": "2026-05-04T01:58:18.777Z"
+}
