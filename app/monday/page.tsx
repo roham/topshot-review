@@ -30,16 +30,16 @@ export default function MondayPage() {
           </div>
           <div className="px-6 py-5">
             <p className="text-[13px] text-ink-400 leading-relaxed mb-4">
-              Five hand-crafted emails — zero generated content. One shell, real player names, real serial numbers, real market data. Bread-and-butter e-commerce structure. Do these look like emails you&apos;d send?
+              Six hand-crafted emails — zero generated content. One shell, real player names, real serial numbers, real market data. Bread-and-butter e-commerce structure. Do these look like emails you&apos;d send?
             </p>
             <a
               href="/specimens"
               className="inline-flex items-center gap-2 bg-flame-500 hover:bg-flame-600 text-white rounded-lg px-5 py-3 text-[13px] font-semibold transition-colors"
             >
-              Review the 5 specimens →
+              Review the 6 specimens →
             </a>
             <p className="mt-3 text-[11px] text-ink-600">
-              Abandoned Cart · Drop Announcement · Welcome · Pack Received · Reactivation
+              Abandoned Cart · Drop Announcement · Welcome · Pack Received · Reactivation · Fast Break
             </p>
           </div>
         </div>

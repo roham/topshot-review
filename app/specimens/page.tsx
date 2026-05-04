@@ -172,6 +172,32 @@ const SPECIMENS: EmailSpecimen[] = [
     cta: "See Your Collection",
     footerLinks: "Manage preferences · Unsubscribe · Help",
   },
+  {
+    id: "fast-break-marcus",
+    trigger: "Fast Break",
+    label: "Marcus · Slate W2-014 · missed Gold by 17",
+    subject: "17 pts. 5h. Victor Wembanyama.",
+    preheader: "Slate W2-014: your gap, the field, the next lock",
+    from: "NBA Top Shot <fastbreak@nbatopshot.com>",
+    hero: { src: IMG.winExperience, alt: "West Semis Fast Break — slate results" },
+    headline: "You were 17 points from Gold.",
+    productCard: {
+      image: IMG.momentPlaceholder,
+      title: "Victor Wembanyama — the swing you needed",
+      rows: [
+        { label: "Your lineup score", value: "143 pts" },
+        { label: "Next tier (Gold)", value: "160 pts · +$25" },
+        { label: "Wemby swing", value: "+19 pts · floor $3" },
+      ],
+    },
+    paragraphs: [
+      "Slate W2-014 closed at 11:59 PM ET. Your top lineup scored 143. The field median was 139. The next prize tier — Gold, $25 — required 160. You missed it by 17 points.",
+      "The single biggest lineup swap that would have changed that outcome: Victor Wembanyama. His final score was the top individual performance in the slate. The floor on his Moments is $3 right now, 5 hours before the next slate locks.",
+      "The next slate locks at 6:45 PM ET. Same tier structure. Your lineup carries over. The gap closed by 17 points is the difference between Silver and Gold — one Moment.",
+    ],
+    cta: "Open next slate →",
+    footerLinks: "Slate history · Prize structure · Unsubscribe",
+  },
 ];
 
 // ─── EMAIL PREVIEW ───────────────────────────────────────────────────────────
@@ -423,12 +449,12 @@ export default function SpecimensPage() {
           NBA Top Shot · Email Specimens
         </div>
         <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-ink-50 text-balance">
-          5 hand-crafted emails.
+          6 hand-crafted emails.
         </h1>
         <p className="mt-2 text-[13.5px] text-ink-400 leading-relaxed max-w-lg">
           No Liquid variables. No callout grids. No variants. Real player names, real serial numbers,
           real market data. Bread-and-butter e-commerce structure: logo → headline → body → CTA → footer.
-          Does the first one look like a real email?
+          All six triggers from the ship-first-three roadmap are represented.
         </p>
 
         {/* Specimens */}
