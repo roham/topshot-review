@@ -318,7 +318,21 @@ export function loadAutoresearchCards(opts: LoadOptions = {}): {
     }
   }
 
-  let filtered = entries.filter((e) => (e.total_score ?? 0) >= minScore);
+  // Hard filter: drop drafts using CLI / ASCII-table / monospace-as-aesthetic
+  // formats — they read as server logs, not designed emails. The drafter's
+  // updated prompt forbids `<pre>` going forward; this filter cleans up
+  // anything still in the leaderboard from earlier iterations.
+  const isDesignReady = (e: LeaderboardEntry): boolean => {
+    const html = e.draft?.body_html ?? "";
+    if (/<pre[\s>]/i.test(html)) return false;
+    if (/font-family:\s*['"]?(IBM Plex Mono|Menlo|monospace|Courier)/i.test(html)) return false;
+    if (/^\/\/\s/m.test(html.replace(/<[^>]+>/g, ""))) return false;
+    return true;
+  };
+
+  let filtered = entries.filter(
+    (e) => (e.total_score ?? 0) >= minScore && isDesignReady(e)
+  );
 
   if (bestPerSlice) {
     const bestBy: Record<string, LeaderboardEntry> = {};

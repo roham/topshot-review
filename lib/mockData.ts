@@ -318,7 +318,7 @@ export const AUTORESEARCH_DEFAULTS: MockContext = {
   peer_median_completion_display: "8/15",
   moments_above_median: "4",
   moments_remaining: "3",
-  listings_available_count: "47",
+  listings_available_count: "3", // matches moments_remaining for internal consistency
   listings_snapshot_time: "5 min ago",
   set_marquee_player: "Cooper Flagg",
   set_chronicler_note:
@@ -380,9 +380,12 @@ export const AUTORESEARCH_DEFAULTS: MockContext = {
     name: "Rookie Debut · Cooper Flagg",
     owned_count: "9",
     total_count: "15",
+    remaining_count: "3",
+    peer_completion_count: "1,420",
     badge_image_url: "/cards/infographics/setcard.png",
     floor_price: "$72",
     seven_d_volume: "$447,200",
+    page_url: "https://nbatopshot.com/sets/series-9",
   },
   user: {
     first_name: "Sarah",
@@ -396,7 +399,11 @@ export const AUTORESEARCH_DEFAULTS: MockContext = {
     starts_at_local: "Tue 7:00 PM ET",
     floor_target: "$72",
     moment_count: "15",
+    moments_in_set_count: "3",
     circulation_total: "8,500",
+    mint_close_local: "Wed 11:59 PM ET",
+    playoff_round_label: "Conference Semifinals",
+    set_page_url: "https://nbatopshot.com/sets/series-9",
   },
   market: {
     weekly_volume: "$2.4M",
