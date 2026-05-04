@@ -1,6 +1,6 @@
 import type { UpgradeCard as TUpgradeCard, UpgradeState, AfterVariantId, AfterBlock } from "@/lib/cards";
 import { resolveLiquidBody, resolveLiquidString, type LiquidContext } from "@/lib/liquid";
-import { MOCK_CONTEXTS } from "@/lib/mockData";
+import { MOCK_CONTEXTS, AUTORESEARCH_DEFAULTS } from "@/lib/mockData";
 import { renderEmail, CARD_TEMPLATE_MAP, resolveTemplateId, type TemplateId } from "./templates";
 
 // ────────────────────────────────────────────────────────────
@@ -711,13 +711,20 @@ export function UpgradeCard({
     "auto-whale-": "whale-tier-concierge",
   };
   let mockKey = card.id;
+  let isAuto = false;
   for (const [prefix, handBuiltId] of Object.entries(AUTO_TO_HANDBUILT)) {
     if (card.id.startsWith(prefix)) {
       mockKey = handBuiltId;
+      isAuto = true;
       break;
     }
   }
-  const ctx = MOCK_CONTEXTS[mockKey] ?? {};
+  // Auto-* cards: merge AUTORESEARCH_DEFAULTS UNDER trigger-specific mock so
+  // any Liquid var the drafter invented gets a sensible fallback while the
+  // hand-curated mock data still wins where it exists.
+  const ctx = isAuto
+    ? { ...AUTORESEARCH_DEFAULTS, ...(MOCK_CONTEXTS[mockKey] ?? {}) }
+    : MOCK_CONTEXTS[mockKey] ?? {};
 
   if (!after) return null;
 

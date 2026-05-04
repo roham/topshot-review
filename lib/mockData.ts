@@ -292,6 +292,92 @@ const SOCIAL_PROOF = {
 };
 
 // ===================================================================
+// AUTORESEARCH_DEFAULTS — flat-key fallback for every Liquid var the
+// drafter subagents tend to invent. Each per-trigger autoresearch card
+// merges these UNDER its trigger-specific MOCK_CONTEXTS entry, so the
+// hand-curated values still win. Without this, headlines like
+// "{{top_set_name}}: {{moments_owned_pre}} → {{moments_owned_post}}"
+// render the raw Liquid and look broken.
+// ===================================================================
+
+export const AUTORESEARCH_DEFAULTS: MockContext = {
+  // identity / user
+  user_first_name: "Sarah",
+  customer: SARAH,
+
+  // pack-received family
+  top_set_name: "Rookie Debut · Cooper Flagg",
+  set_badge_image_url: "/cards/infographics/setcard.png",
+  pack_opened_relative_time: "12 minutes ago",
+  moments_owned_pre: "9",
+  moments_owned_post: "12",
+  moments_total: "15",
+  completion_pre_pct: "60",
+  completion_post_pct: "80",
+  completion_lift_moments: "3",
+  peer_median_completion_display: "8/15",
+  moments_above_median: "4",
+  moments_remaining: "3",
+  listings_available_count: "47",
+  listings_snapshot_time: "5 min ago",
+  set_marquee_player: "Cooper Flagg",
+  set_chronicler_note:
+    "the first postseason of the most-anticipated rookie since LeBron",
+  set_curator_name: "Guy",
+  setFlowID: "rookie-debut-2026",
+  set_7d_volume_count: "2,420",
+  set_7d_median_price: "$185",
+  set_floor_today: "$72",
+  set_floor_change_7d: "+18%",
+  // drop-announcement family
+  user_active_playoff_set_count: "3",
+  prior_cycle_minter_count: "5,780",
+  drop_id: "series-9-flagg",
+  drop_name: "Series 9 — Cooper Flagg Rookie Edition",
+  drop_set_name: "The Rookie Era",
+  drop_tier: "Premium",
+  drop_circulation: "8,500",
+  drop_moment_count: "15",
+  drop_starts_at_local: "Tue 7:00 PM ET",
+  drop_floor_target: "$72",
+  // fast-break family
+  fast_break_game_count: "6",
+  min_fast_break_entry_price_usd: "$0.99",
+  first_tipoff_time_local: "7:30 PM ET",
+  slate_date_pretty: "Tonight, Tue May 5",
+  entries_in_last_hour: "312",
+  fast_break_slate_url: "https://nbatopshot.com/fast-break",
+  weekly_player_buyers: "47",
+  // welcome family
+  starter_pack_url: "https://nbatopshot.com/starter",
+  free_pack_circulation: "12,000",
+  fans_in_last_24h: "8,402",
+  // abandoned-cart family
+  cart_item_player: "Tyrese Maxey",
+  cart_item_set: "Series 7 · Crescendo",
+  cart_item_price: "$48",
+  cart_item_serial: "247",
+  cart_lookback_minutes: "48",
+  last_24h_sales: "75",
+  last_24h_max: "$1,500",
+  // reactivation family
+  days_since_last_session: "1,698",
+  pct_change_holdings: "+240%",
+  weekly_marketplace_volume: "$2.4M",
+  series_now_live: "Series 9",
+  // generic CTAs / display
+  set_url: "https://nbatopshot.com/sets/series-9",
+  pack_url: "https://nbatopshot.com/packs",
+  marketplace_url: "https://nbatopshot.com/marketplace",
+  // image fallbacks
+  hero_url: "/cards/infographics/moment-hero-placeholder.png",
+  moment_image_url: "/cards/infographics/moment-hero-placeholder.png",
+  player_image_url: "/cards/infographics/moment-hero-placeholder.png",
+  // currency / time stubs
+  currency_symbol: "$",
+};
+
+// ===================================================================
 // Per-card mock contexts. Keys match card IDs in lib/cards.ts.
 // ===================================================================
 

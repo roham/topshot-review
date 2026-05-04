@@ -19,7 +19,9 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import type { Card, AfterBlock, AfterVariantId } from "./cards";
+import type { Card, AfterBlock } from "./cards";
+import { resolveLiquidString } from "./liquid";
+import { AUTORESEARCH_DEFAULTS } from "./mockData";
 
 // ---------------------------------------------------------------------------
 // Leaderboard entry shape (mirrors what runner.py writes)
@@ -114,19 +116,34 @@ function htmlToBodyArray(html: string | undefined): string[] {
   // The drafter outputs a constrained subset: <p>, <strong>, <ul>, <li>, <a>.
   const out: string[] = [];
 
-  // Replace <ul>...</ul> blocks with their bullet-prefixed list items
-  let processed = html.replace(/<ul[^>]*>([\s\S]*?)<\/ul>/gi, (_, inner) => {
+  // <pre> blocks (ASCII tables / monospace data cards) — split on newlines
+  let processed = html.replace(/<pre[^>]*>([\s\S]*?)<\/pre>/gi, (_, inner) => {
+    const lines = stripTags(String(inner))
+      .split(/\n/)
+      .map((l) => l.trimEnd())
+      .filter((l) => l.trim().length);
+    return `\n__BLOCK__\n${lines.join("\n__BLOCK__\n")}\n__BLOCK__\n`;
+  });
+
+  // <ul>...</ul> blocks → bullet-prefixed list items
+  processed = processed.replace(/<ul[^>]*>([\s\S]*?)<\/ul>/gi, (_, inner) => {
     const items = Array.from(inner.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/gi)).map(
       (m) => `• ${stripTags((m as RegExpMatchArray)[1]).trim()}`
     );
     return `\n__BLOCK__\n${items.join("\n__BLOCK__\n")}\n__BLOCK__\n`;
   });
 
-  // Headings (h2/h3) — flatten to their own paragraphs
+  // Headings (h2/h3) → own paragraphs
   processed = processed.replace(/<h[1-6][^>]*>([\s\S]*?)<\/h[1-6]>/gi, "\n__BLOCK__\n$1\n__BLOCK__\n");
 
-  // Replace <p>...</p> blocks
+  // <p>...</p>
   processed = processed.replace(/<p[^>]*>([\s\S]*?)<\/p>/gi, "\n__BLOCK__\n$1\n__BLOCK__\n");
+
+  // <div> wrappers — strip but preserve inner block structure
+  processed = processed.replace(/<\/?div[^>]*>/gi, "\n__BLOCK__\n");
+
+  // <br> → block break
+  processed = processed.replace(/<br\s*\/?>/gi, "\n__BLOCK__\n");
 
   // Split by block markers, strip remaining tags, drop empties
   for (const seg of processed.split("__BLOCK__")) {
@@ -190,11 +207,17 @@ export function entryToCard(entry: LeaderboardEntry, position: number): Card {
 
   const draft = entry.draft ?? {};
   const bodyArr = htmlToBodyArray(draft.body_html);
+  // Resolve headline-display Liquid (subject, preheader) with the
+  // autoresearch defaults so the card's static text fields don't show
+  // raw `{{var}}`. The detailed in-email body still goes through full
+  // per-trigger Liquid resolution at render time.
+  const resolvedSubject = resolveLiquidString(draft.subject, AUTORESEARCH_DEFAULTS as Record<string, unknown>);
+  const resolvedPreheader = resolveLiquidString(draft.preheader, AUTORESEARCH_DEFAULTS as Record<string, unknown>);
 
   const after: AfterBlock = {
     label: `${triggerLabel} · ${draft.voice_mode ?? "draft"}`,
     from: "NBA Top Shot <hello@nbatopshot.com>",
-    subject: draft.subject ?? "(no subject)",
+    subject: draft.subject ?? "(no subject)", // raw — UpgradeCard will Liquid-resolve via the merged ctx
     preheader: draft.preheader ?? "",
     emailHero: {
       src: hero,
@@ -224,7 +247,7 @@ export function entryToCard(entry: LeaderboardEntry, position: number): Card {
     stack_item: `${triggerLabel} · ${icpLabel} · ${tierLabel}`,
     hero,
     kind: "upgrade",
-    headline: draft.subject ?? `${triggerLabel} candidate`,
+    headline: resolvedSubject || draft.subject || `${triggerLabel} candidate`,
     pills: {
       audience: `${icpLabel} · ${tierLabel}`,
       trigger: `${triggerLabel} · iter ${entry.iteration}`,
