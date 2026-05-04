@@ -66,7 +66,21 @@ export default function Home() {
             )}
           </div>
 
-          <div className="mt-12 grid grid-cols-3 gap-3 text-left">
+          {/* Monday session callout */}
+          <div className="mt-10 rounded-2xl border border-flame-500/40 bg-flame-500/[0.05] px-5 py-4 text-left max-w-md mx-auto">
+            <div className="text-[10.5px] uppercase tracking-wider text-flame-400 font-semibold mb-1">May 5 · Monday Review Session</div>
+            <p className="text-[13px] text-ink-200 leading-relaxed mb-3">
+              Three decisions: copy direction, trigger priority, engineering authorization. Start here.
+            </p>
+            <a
+              href="/monday"
+              className="inline-flex items-center gap-1.5 bg-flame-500 hover:bg-flame-600 text-white rounded-lg px-4 py-2 text-[12px] font-semibold transition-colors"
+            >
+              Monday session →
+            </a>
+          </div>
+
+          <div className="mt-8 grid grid-cols-3 gap-3 text-left">
             {[
               { n: "28", l: "Variants to vote" },
               { n: "~15 min", l: "Linear flow" },
