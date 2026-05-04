@@ -1,0 +1,9 @@
+{
+  "piece_id": "abandoned-cart",
+  "variant": "v1001",
+  "vote": "needs-work",
+  "note": "- image is mismatched \n- \"moment hasnt moved\" is stupid, implies it wont move\n- rest of copy is awkward, should be exciting and visual AT A GLANCE, not require reading\n- try using openai image-2 to make infographics and text diagrams",
+  "reasons": [],
+  "voter": "tester",
+  "ts": "2026-05-04T06:40:52.740Z"
+}
