@@ -5,8 +5,10 @@ import { SwipeDeck } from "@/components/SwipeDeck";
 import { ExemplarDeck } from "@/components/ExemplarDeck";
 import { OpenQuestionsDeck } from "@/components/OpenQuestionsDeck";
 import { LabDeck } from "@/components/LabDeck";
+import { FoundationsDeck } from "@/components/FoundationsDeck";
+import { FOUNDATIONS_CARDS } from "@/lib/foundations";
 
-type ActiveDeck = "email-variants" | "exemplars" | "open-questions" | "lab" | null;
+type ActiveDeck = "email-variants" | "exemplars" | "open-questions" | "lab" | "foundations" | null;
 
 export default function ReviewPage() {
   const [voter, setVoter] = useState<string | null>(null);
@@ -44,6 +46,10 @@ export default function ReviewPage() {
     return <LabDeck voter={voter} onBack={() => setActiveDeck(null)} />;
   }
 
+  if (activeDeck === "foundations") {
+    return <FoundationsDeck voter={voter} onBack={() => setActiveDeck(null)} />;
+  }
+
   // Compute total steps for email variants
   const emailStepCount = CARDS.reduce((acc, card) => {
     const variantKeys = ["c1", "c2", "c3"] as const;
@@ -66,6 +72,14 @@ export default function ReviewPage() {
 
         {/* Deck cards */}
         <div className="mt-8 flex flex-col gap-3">
+          <DeckCard
+            title="Email Foundations"
+            subtitle={`${FOUNDATIONS_CARDS.length} docs · canonical action plan + 6 stages + audit`}
+            description="The six-stage email-marketing-foundations swarm output. Canonical action plan, voice-register A/B test spec, plugin-validated CMO frame, per-archetype flow maps. Vote ship / needs-work / no on each. Deep-link to full markdown on collect-hq."
+            accent="flame"
+            badge="NEW · canonical"
+            onClick={() => setActiveDeck("foundations")}
+          />
           <DeckCard
             title="Email Variants"
             subtitle={`${CARDS.length} emails · ${emailStepCount} total variants`}
